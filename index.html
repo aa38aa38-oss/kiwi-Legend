@@ -137,7 +137,6 @@
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
   }
 
-  /* 手機直立模式：縮小首頁選單並移至畫面最底部，避免擋住標題與主角圖檔 */
   @media (max-aspect-ratio: 1/1) {
     .title-menu-box {
       top: auto;
@@ -276,7 +275,8 @@
       padding: 8px 14px;
       font-size: clamp(14px, 3.8vw, 17px);
       border-radius: 8px;
-      white-space: nowrap;
+      white-space: normal; /* 允許文字換行，以容納較長台詞 */
+      text-align: center;
     }
   }
 
@@ -1046,7 +1046,7 @@ function triggerFruitKing2() {
   showDialogue(
     "🍎 新店水果王",
     `<span>「看來你湊齊 100 元了，來吃我的無敵水果吧！」<br><br><div style='background: #2d3436; border: 2px solid #f1c40f; border-radius: 8px; padding: 6px 12px; display: inline-block; color: #f1c40f; font-weight: 900;'>💰 持有金錢：$${money}</div></span>`,
-    `<button class="dialog-btn btn-opt2" onclick="rejectFruitAndShowEnemies()">🥝 (嫌棄) 你的水果根本沒用！</button>`
+    `<button class="dialog-btn btn-opt2" onclick="rejectFruitAndShowEnemies()">🥝 你不買烤盤也不買戒指，老子有錢也不跟你買水果啦</button>`
   );
 }
 
@@ -1933,12 +1933,16 @@ function drawShangShengNpc() {
     ctx.fillText("上昇 (背影)", shangshengNpc.x + shangshengNpc.w / 2, shangshengNpc.y + 70);
   }
 
-  ctx.fillStyle = "#f1c40f";
-  ctx.font = "bold 16px sans-serif";
-  ctx.textAlign = "center";
+  // 根據觸發狀態變更提示文字與顏色
   if (!shangshengTriggered) {
+    ctx.fillStyle = "#f1c40f"; // 觸發前為黃色
+    ctx.font = "bold 16px sans-serif";
+    ctx.textAlign = "center";
     ctx.fillText("💬 碰我交談", shangshengNpc.x + shangshengNpc.w / 2, shangshengNpc.y - 10);
   } else {
+    ctx.fillStyle = "#000000"; // 觸發後改為黑色粗體
+    ctx.font = "900 16px sans-serif";
+    ctx.textAlign = "center";
     ctx.fillText("✨ 上昇大哥", shangshengNpc.x + shangshengNpc.w / 2, shangshengNpc.y - 10);
   }
   ctx.restore();
