@@ -555,6 +555,7 @@ let qiaoXinBossDefeated = false;
 let qiaoXinHp = 22000;
 let qiaoXinMaxHp = 22000;
 let qiaoXinAttackTimer = 0;
+let qiaoXinSpawnTimer = 0;
 let heartBeatTimer = 0;
 
 let shangshengNpc = {
@@ -652,6 +653,8 @@ function startGameAtChapter(ch) {
   qiaoXinBossTriggered = false;
   qiaoXinBossDefeated = false;
   qiaoXinHp = 22000;
+  qiaoXinAttackTimer = 0;
+  qiaoXinSpawnTimer = 0;
 
   if (ch === 1) {
     enterSanchong();
@@ -1100,15 +1103,17 @@ function showBigTransformDialogue2() {
 
 function triggerQiaoXinBoss() {
   qiaoXinBossTriggered = true;
+  qiaoXinAttackTimer = 0;
+  qiaoXinSpawnTimer = 0;
   showDialogue(
     "👑 新莊王 巧馨 (本體)",
-    "<span><div style='font-weight: 900; color: #000; text-align: center;'>「我是黑店 新莊王 巧馨 的心臟！」</div><br>黑化力量正在劇烈跳動，準備好被黑店的垃圾袋淹沒了嗎？</span>",
+    "<span><div style='font-weight: 900; color: #000; text-align: center;'>「我是黑店 新莊王 巧馨 的心臟！」</div><br>黑化力量正在劇烈跳動，準備好被黑店的傾瀉垃圾淹沒了嗎？</span>",
     `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); startQiaoXinFight();">⚔️ 決一死戰！</button>`
   );
 }
 
 function startQiaoXinFight() {
-  document.getElementById("qualify-txt").innerText = "🔥 最終決戰！攻擊【黑化跳動之心】摧毀 新莊王 巧馨！";
+  document.getElementById("qualify-txt").innerText = "🔥 最終決戰！擊碎垃圾彈雨並消滅黑化援軍，攻擊【黑化跳動之心】！";
   document.getElementById("qualify-txt").style.color = "#d63031";
 }
 
@@ -1287,19 +1292,93 @@ function update() {
     }
     if (player.x >= 8000 && !qiaoXinBossTriggered) triggerQiaoXinBoss();
 
+    // ------------------------------------
+    // 新莊王 巧馨 BOSS戰 強化攻擊手段與敵人召喚
+    // ------------------------------------
     if (qiaoXinBossTriggered && !qiaoXinBossDefeated) {
+      const isEnraged = (qiaoXinHp < qiaoXinMaxHp * 0.5);
+      const attackInterval = isEnraged ? 20 : 28;
+
       qiaoXinAttackTimer++;
-      if (qiaoXinAttackTimer > 35) {
+      if (qiaoXinAttackTimer > attackInterval) {
         qiaoXinAttackTimer = 0;
+
+        // 攻擊型態 1：大量黑化垃圾袋群向下傾瀉 (3 ~ 5 個)
+        const waveCount = isEnraged ? 4 : 3;
+        for (let k = 0; k < waveCount; k++) {
+          projectiles.push({
+            x: 8350 + Math.random() * 550,
+            y: 20 + Math.random() * 30,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (3.8 + Math.random() * 4.2) * (isEnraged ? 1.25 : 1.0),
+            life: 100,
+            isBlackBag: true,
+            scale: 1.1 + Math.random() * 0.3
+          });
+        }
+
+        // 攻擊型態 2：黑心臟本體向玩家方向噴射追擊黑氣彈
+        const heartCenterX = 8750;
+        const heartCenterY = 160;
+        const targetDirX = player.x - heartCenterX;
+        const targetDirY = player.y - heartCenterY;
+        const dist = Math.hypot(targetDirX, targetDirY) || 1;
+        const aimSpeed = isEnraged ? 6.5 : 5.0;
+
         projectiles.push({
-          x: 8400 + Math.random() * 400,
-          y: 40,
-          vx: (Math.random() - 0.5) * 6,
-          vy: 4 + Math.random() * 4,
-          life: 100,
+          x: heartCenterX,
+          y: heartCenterY,
+          vx: (targetDirX / dist) * aimSpeed + (Math.random() - 0.5) * 1.5,
+          vy: (targetDirY / dist) * aimSpeed,
+          life: 90,
           isBlackBag: true,
-          scale: 1.2
+          scale: 1.4
         });
+      }
+
+      // BOSS持續召喚敵人機制：維持戰場壓迫感 (上限 7 隻)
+      qiaoXinSpawnTimer++;
+      const currentBossEnemies = enemies.filter(en => en.alive && en.x >= 8000).length;
+      const spawnInterval = isEnraged ? 90 : 130;
+
+      if (qiaoXinSpawnTimer > spawnInterval && currentBossEnemies < 7) {
+        qiaoXinSpawnTimer = 0;
+        const spawnTypeRand = Math.random();
+        if (spawnTypeRand < 0.45) {
+          // 召喚棒球打手
+          enemies.push({
+            type: "baseballBatter",
+            x: 8200 + Math.random() * 500,
+            y: 250,
+            w: 60, h: 95,
+            vx: -2.0, vy: 0,
+            jumpForce: 10, baseGroundY: 380,
+            minX: 8100, maxX: 8900,
+            alive: true
+          });
+        } else if (spawnTypeRand < 0.75) {
+          // 召喚投球流氓
+          enemies.push({
+            type: "baseballThrower",
+            x: 8300 + Math.random() * 450,
+            y: 250,
+            w: 60, h: 95,
+            vx: -0.8, vy: 0,
+            jumpForce: 8, baseGroundY: 380,
+            minX: 8200, maxX: 8950,
+            alive: true, attackTimer: 30
+          });
+        } else {
+          // 召喚空中猛禽
+          enemies.push({
+            type: "diveBird",
+            x: 8700,
+            y: 60 + Math.random() * 50,
+            w: 50, h: 40,
+            vx: -3.6, vy: 1.8,
+            alive: true
+          });
+        }
       }
 
       if (player.isAttacking && !isPlayerDead) {
@@ -1359,7 +1438,6 @@ function update() {
   enemies.forEach(en => {
     if (!en.alive) return;
     if (bossTriggered && !bossDefeated && currentScene === "street") return;
-    if (qiaoXinBossTriggered && !qiaoXinBossDefeated && currentScene === "xinzhuang") return;
 
     if (en.type === "drunkard") {
       en.x += en.vx;
@@ -1748,11 +1826,13 @@ function drawQiaoXinBoss() {
 
   const centerX = 8750;
   const centerY = 160;
-  const pulse = 1 + Math.sin(heartBeatTimer * 4) * 0.12;
+  const isEnraged = (qiaoXinHp < qiaoXinMaxHp * 0.5);
+  const pulseSpeed = isEnraged ? 7 : 4;
+  const pulse = 1 + Math.sin(heartBeatTimer * pulseSpeed) * (isEnraged ? 0.18 : 0.12);
 
-  ctx.shadowColor = "#8e44ad";
-  ctx.shadowBlur = 35 * pulse;
-  ctx.strokeStyle = "rgba(142, 68, 173, 0.4)";
+  ctx.shadowColor = isEnraged ? "#d63031" : "#8e44ad";
+  ctx.shadowBlur = (isEnraged ? 45 : 35) * pulse;
+  ctx.strokeStyle = isEnraged ? "rgba(231, 76, 60, 0.5)" : "rgba(142, 68, 173, 0.4)";
   ctx.lineWidth = 8;
   ctx.beginPath();
   ctx.arc(centerX, centerY, 130 * pulse, 0, Math.PI * 2);
@@ -1764,9 +1844,9 @@ function drawQiaoXinBoss() {
 
   ctx.shadowColor = "#000000";
   ctx.shadowBlur = 25;
-  ctx.fillStyle = "#111116";
-  ctx.strokeStyle = "#c0392b";
-  ctx.lineWidth = 5;
+  ctx.fillStyle = isEnraged ? "#220a0a" : "#111116";
+  ctx.strokeStyle = isEnraged ? "#ff4757" : "#c0392b";
+  ctx.lineWidth = isEnraged ? 6 : 5;
 
   ctx.beginPath();
   ctx.moveTo(0, 30);
@@ -1776,7 +1856,7 @@ function drawQiaoXinBoss() {
   ctx.fill();
   ctx.stroke();
 
-  ctx.strokeStyle = "#e74c3c";
+  ctx.strokeStyle = isEnraged ? "#ff6b81" : "#e74c3c";
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.moveTo(-15, -45); ctx.lineTo(-35, -20); ctx.lineTo(-10, 5);
@@ -1789,15 +1869,15 @@ function drawQiaoXinBoss() {
 
   ctx.restore();
 
-  ctx.fillStyle = "#e84393";
+  ctx.fillStyle = isEnraged ? "#ff4757" : "#e84393";
   ctx.font = "bold 32px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("🖤 新莊王 巧馨．黑化跳動之心 🖤", centerX, 320);
+  ctx.fillText(isEnraged ? "🔥 新莊王 巧馨．暴怒黑化之心 🔥" : "🖤 新莊王 巧馨．黑化跳動之心 🖤", centerX, 320);
 
   const bBarX = 8550, bBarY = 15, bBarW = 400, bBarH = 16;
   ctx.fillStyle = "#000";
   ctx.fillRect(bBarX - 4, bBarY - 4, bBarW + 8, bBarH + 8);
-  ctx.fillStyle = "#8e44ad";
+  ctx.fillStyle = isEnraged ? "#e74c3c" : "#8e44ad";
   ctx.fillRect(bBarX, bBarY, (qiaoXinHp / qiaoXinMaxHp) * bBarW, bBarH);
   ctx.strokeStyle = "#fff";
   ctx.lineWidth = 2;
@@ -2040,12 +2120,17 @@ function draw() {
       ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
       ctx.fill();
     } else if (p.isBlackBag) {
+      const bagSize = 22 * (p.scale || 1);
       ctx.shadowColor = "#000";
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = "#2d3436";
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = "#1e272e";
       ctx.beginPath();
-      ctx.roundRect(p.x - 10, p.y - 10, 20, 20, 5);
+      ctx.roundRect(p.x - bagSize / 2, p.y - bagSize / 2, bagSize, bagSize, 6);
       ctx.fill();
+
+      // 垃圾袋扎口細節
+      ctx.fillStyle = "#e84393";
+      ctx.fillRect(p.x - 3, p.y - bagSize / 2 - 3, 6, 4);
     } else if (p.isBaseball) {
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
