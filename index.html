@@ -445,6 +445,8 @@
           <button class="chapter-item-btn" onclick="startGameAtChapter(2)">🔥 第二章：新莊討伐戰 (街區起點)</button>
           <button class="chapter-item-btn" onclick="startGameAtChapter(2.3)">🤝 第二章中期：直達【上昇大哥會合點】</button>
           <button class="chapter-item-btn" onclick="startGameAtChapter(2.5)">🖤 第二章決戰：直達【新莊王 巧馨 黑心祭壇】</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(3)">🌈 第三章：Match Club 救主突入戰 (起點)</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(3.2)">🍸 第三章：直達【林口洪主委 會合處】</button>
         </div>
         <button class="chapter-close-btn" onclick="closeChapterModal()">關閉選單</button>
       </div>
@@ -547,8 +549,12 @@ playerSlashImg.onerror = () => { playerSlashImg.src = "player-slash.png.png"; };
 const shangshengImg = new Image();
 shangshengImg.src = "背影.png";
 
+// 第三章資源：林口洪主委
+const luonanImg = new Image();
+luonanImg.src = "裸男.png";
+
 let isTitleMode = true;
-let currentScene = "street";
+let currentScene = "street"; // street | xinzhuang | matchClub
 let isDialogueOpen = false;
 let streetCleared = false;
 let hasPlayerPic = false;
@@ -572,6 +578,17 @@ let shangshengNpc = {
   y: 159,
   w: 204,
   h: 221,
+  visible: true
+};
+
+// 第三章狀態變數
+let hongZhuWeiTriggered = false;
+let matchClubDiscoTimer = 0;
+let hongZhuWeiNpc = {
+  x: 2400,
+  y: 240,
+  w: 125,
+  h: 140,
   visible: true
 };
 
@@ -665,6 +682,9 @@ function startGameAtChapter(ch) {
   qiaoXinAttackTimer = 0;
   qiaoXinSpawnTimer = 0;
 
+  hongZhuWeiTriggered = false;
+  hongZhuWeiNpc.visible = true;
+
   if (ch === 1) {
     enterSanchong();
   } else if (ch === 1.5) {
@@ -699,6 +719,12 @@ function startGameAtChapter(ch) {
     fruitKing2Triggered = true;
     money = 10000;
     updateMoneyUI();
+  } else if (ch === 3) {
+    enterMatchClub();
+  } else if (ch === 3.2) {
+    enterMatchClub();
+    player.x = 2250;
+    cameraX = 2000;
   }
 }
 
@@ -1126,11 +1152,108 @@ function startQiaoXinFight() {
   document.getElementById("qualify-txt").style.color = "#d63031";
 }
 
+// ----------------------------------------
+// 第三章：Match Club 歡場冒險
+// ----------------------------------------
+function enterMatchClub() {
+  currentScene = "matchClub";
+  mapWidth = 8000;
+  cameraX = 0;
+  isDialogueOpen = false;
+  document.getElementById("dialog-box").style.display = "none";
+  document.getElementById("money-ui").style.display = "none";
+
+  player.x = 180;
+  player.y = 250;
+  player.vx = 0;
+  player.vy = 0;
+  player.grounded = true;
+  player.jumpCount = 0;
+  player.invincibleTimer = 0;
+  player.isDashing = false;
+  player.isCrouching = false;
+  player.scale = 1.2;
+  targetScale = 1.2;
+  applyPlayerSize();
+
+  hongZhuWeiTriggered = false;
+  hongZhuWeiNpc.visible = true;
+
+  platforms = [ { x: 0, y: 380, w: 8000, h: 70, color: "#1f142e" } ];
+  for (let i = 1; i < 25; i++) {
+    platforms.push({ x: 300 * i, y: 380 - (i % 3) * 45, w: 140, h: 18, color: "#8e44ad" });
+  }
+
+  cityProps = [
+    { x: 300, y: 90, w: 30, h: 100, text: "MATCH CLUB", bg: "#fd79a8", isBigPlacard: true },
+    { x: 1200, y: 80, w: 26, h: 95, text: "猛男熱舞舞台", bg: "#e84393" },
+    { x: 2350, y: 70, w: 28, h: 110, text: "主委VIP包廂", bg: "#f1c40f", isBigPlacard: true },
+    { x: 3800, y: 80, w: 26, h: 100, text: "狂熱旋轉吧", bg: "#9b59b6" }
+  ];
+
+  enemies = [];
+  // 設置猛男與裸男軍團
+  for (let i = 0; i < 10; i++) {
+    enemies.push({
+      type: i % 2 === 0 ? "muscleMan" : "nakedMan",
+      x: 650 + i * 180,
+      y: 250,
+      w: 68,
+      h: 98,
+      vx: -1.8 - (i % 2) * 0.6,
+      vy: 0,
+      jumpForce: 9.5,
+      baseGroundY: 380,
+      minX: 550 + i * 160,
+      maxX: 950 + i * 200,
+      alive: true
+    });
+  }
+
+  document.getElementById("qualify-txt").innerText = "🌈 勇闖 Match Club！突破猛男與裸男軍團，尋找林口洪主委！";
+  document.getElementById("qualify-txt").style.color = "#fd79a8";
+}
+
+function triggerHongZhuWei() {
+  hongZhuWeiTriggered = true;
+  showDialogue(
+    "🍸 林口洪主委 (主人)",
+    `<span><div style="font-weight: 900; color: #e67e22; font-size: 22px;">「滋溜滋溜... 吧唧吧唧...（忘我狂舔中）」</div><br>奇異果見到主人竟然在歡場這副模樣，當場怒火中燒！</span>`,
+    `<button class="dialog-btn btn-opt1" onclick="shoutAtHongZhuWei()">🐶「你不要再舔了，你他媽的給我回家!」</button>`
+  );
+}
+
+function shoutAtHongZhuWei() {
+  closeDialogue();
+  document.getElementById("qualify-txt").innerText = "⚡ 七彩霓虹燈瘋狂閃爍！天旋地轉！多型態熱狗大軍四面突襲！";
+  document.getElementById("qualify-txt").style.color = "#ff7675";
+
+  // 召喚左右伸縮、上下彈跳、雙節甩棍三種熱狗
+  for (let i = 0; i < 15; i++) {
+    const subType = (i % 3 === 0 ? "hotdogStretch" : (i % 3 === 1 ? "hotdogVertical" : "hotdogStick"));
+    enemies.push({
+      type: subType,
+      x: player.x + 450 + i * 170,
+      y: (subType === "hotdogVertical" ? 80 : 260),
+      w: 80,
+      h: 36,
+      vx: (subType === "hotdogStretch" ? -3.8 : -2.0),
+      vy: (subType === "hotdogVertical" ? 2.8 : 0),
+      alive: true,
+      stickAngle: 0,
+      baseGroundY: 380,
+      minX: player.x,
+      maxX: player.x + 3500
+    });
+  }
+}
+
 function update() {
   if (isTitleMode || isGameOver || isDialogueOpen) return;
 
   hpFlashTimer += 0.15;
   heartBeatTimer += 0.08;
+  matchClubDiscoTimer += 0.08;
 
   for (let i = deathShockwaves.length - 1; i >= 0; i--) {
     const sw = deathShockwaves[i];
@@ -1236,6 +1359,9 @@ function update() {
     if (player.x + player.w > mapWidth) player.x = mapWidth - player.w;
   }
 
+  // ------------------------------------
+  // 第一章
+  // ------------------------------------
   if (currentScene === "street") {
     if (player.x >= 4300 && !bossTriggered) {
       triggerBossEncounter();
@@ -1276,7 +1402,11 @@ function update() {
     if (streetCleared && player.x >= 4900) {
       enterXinzhuang();
     }
-  } else if (currentScene === "xinzhuang") {
+  } 
+  // ------------------------------------
+  // 第二章
+  // ------------------------------------
+  else if (currentScene === "xinzhuang") {
     if (player.x >= 1000 && !chenCoupleTriggered) triggerChenCouple();
     if (player.x >= 2500 && !fruitKing1Triggered) triggerFruitKing1();
 
@@ -1397,10 +1527,22 @@ function update() {
             showDialogue(
               "🖤 新莊王 巧馨 慘叫嗆聲",
               "<span><span style='color: #e74c3c; font-weight: 900; font-size: 24px;'>「打贏我又怎樣，你的主人天天在gay bar樂不思蜀，今晚會有人牽你出門尿尿嗎？哈哈哈哈哈哈哈哈哈」</span><br><br>（黑化心臟劇烈震盪，前方撕裂出通往神祕歡場 Match Club 的光圈通道！）</span>",
-              `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); document.getElementById('qualify-txt').innerText = '🔥 新莊平定！前往 Match Club！';">🌈 前往神祕歡場 Match Club！</button>`
+              `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); enterMatchClub();">🌈 前往神祕歡場 Match Club！</button>`
             );
           }
         }
+      }
+    }
+  }
+  // ------------------------------------
+  // 第三章：Match Club
+  // ------------------------------------
+  else if (currentScene === "matchClub") {
+    // 碰撞到林口洪主委觸發對話
+    if (hongZhuWeiNpc.visible && !hongZhuWeiTriggered) {
+      if (player.x + player.w > hongZhuWeiNpc.x && player.x < hongZhuWeiNpc.x + hongZhuWeiNpc.w &&
+          player.y + player.h > hongZhuWeiNpc.y && player.y < hongZhuWeiNpc.y + hongZhuWeiNpc.h) {
+        triggerHongZhuWei();
       }
     }
   }
@@ -1441,7 +1583,27 @@ function update() {
     if (!en.alive) return;
     if (bossTriggered && !bossDefeated && currentScene === "street") return;
 
-    if (en.type === "drunkard") {
+    if (en.type === "muscleMan" || en.type === "nakedMan") {
+      en.x += en.vx;
+      if (en.x <= en.minX || en.x + en.w >= en.maxX) en.vx *= -1;
+      en.vy += 0.45;
+      en.y += en.vy;
+      if (en.y + en.h >= en.baseGroundY) {
+        en.y = en.baseGroundY - en.h;
+        en.vy = -en.jumpForce * (0.8 + Math.random() * 0.3);
+      }
+    } else if (en.type === "hotdogStretch") {
+      en.x += en.vx;
+      if (en.x <= en.minX || en.x + en.w >= en.maxX) en.vx *= -1;
+    } else if (en.type === "hotdogVertical") {
+      en.y += en.vy;
+      if (en.y >= 350 || en.y <= 60) en.vy *= -1;
+      en.x += -1.5;
+    } else if (en.type === "hotdogStick") {
+      en.x += en.vx;
+      en.stickAngle = (en.stickAngle || 0) + 0.16;
+      if (en.x <= en.minX || en.x + en.w >= en.maxX) en.vx *= -1;
+    } else if (en.type === "drunkard") {
       en.x += en.vx;
       if (en.x <= en.minX || en.x + en.w >= en.maxX) en.vx *= -1;
       en.vy += 0.4;
@@ -1561,7 +1723,7 @@ function update() {
             showDialogue(
               "🖤 新莊王 巧馨 慘叫嗆聲",
               "<span><span style='color: #e74c3c; font-weight: 900; font-size: 24px;'>「打贏我又怎樣，你的主人天天在gay bar樂不思蜀，今晚會有人牽你出門尿尿嗎？哈哈哈哈哈哈哈哈哈」</span><br><br>（黑化心臟劇烈震盪，前方撕裂出通往神祕歡場 Match Club 的光圈通道！）</span>",
-              `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); document.getElementById('qualify-txt').innerText = '🔥 新莊平定！前往 Match Club！';">🌈 前往神祕歡場 Match Club！</button>`
+              `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); enterMatchClub();">🌈 前往神祕歡場 Match Club！</button>`
             );
           }
         }
@@ -1644,6 +1806,28 @@ function drawXinzhuangBackground() {
     ctx.fillStyle = "#636e72";
     ctx.fillRect(ox + 120, 120, 30, 40);
     ctx.fillRect(ox + 820, 100, 40, 50);
+  }
+  ctx.restore();
+}
+
+function drawMatchClubBackground() {
+  const flashHue = Math.floor((matchClubDiscoTimer * 45) % 360);
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, 380);
+  skyGrad.addColorStop(0, `hsl(${flashHue}, 60%, 14%)`);
+  skyGrad.addColorStop(1, "#191124");
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.globalAlpha = 0.22;
+  for (let b = 0; b < 6; b++) {
+    ctx.fillStyle = `hsl(${(flashHue + b * 60) % 360}, 100%, 50%)`;
+    ctx.beginPath();
+    ctx.moveTo(100 + b * 130, 0);
+    ctx.lineTo(200 + b * 130 + Math.sin(matchClubDiscoTimer + b) * 80, 380);
+    ctx.lineTo(80 + b * 130 + Math.sin(matchClubDiscoTimer + b) * 80, 380);
+    ctx.closePath();
+    ctx.fill();
   }
   ctx.restore();
 }
@@ -1952,6 +2136,41 @@ function drawShangShengNpc() {
   ctx.restore();
 }
 
+// 繪製林口洪主委 (裸男.png)
+function drawHongZhuWeiNpc() {
+  if (currentScene !== "matchClub" || !hongZhuWeiNpc.visible) return;
+  ctx.save();
+  ctx.shadowColor = "#f1c40f";
+  ctx.shadowBlur = 20;
+
+  if (luonanImg.complete && luonanImg.naturalWidth > 0) {
+    ctx.drawImage(luonanImg, hongZhuWeiNpc.x, hongZhuWeiNpc.y, hongZhuWeiNpc.w, hongZhuWeiNpc.h);
+  } else {
+    ctx.fillStyle = "#ff7675";
+    ctx.beginPath();
+    ctx.roundRect(hongZhuWeiNpc.x, hongZhuWeiNpc.y, hongZhuWeiNpc.w, hongZhuWeiNpc.h, 12);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("林口洪主委", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y + 75);
+  }
+
+  // 對話後永久標註黑色粗體「主委在此」
+  if (!hongZhuWeiTriggered) {
+    ctx.fillStyle = "#f1c40f";
+    ctx.font = "bold 16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("💬 碰主人交談", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y - 10);
+  } else {
+    ctx.fillStyle = "#000000";
+    ctx.font = "900 16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("主委在此", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y - 10);
+  }
+  ctx.restore();
+}
+
 function drawMegaManHealthBar() {
   const barX = 14;
   const barY = 16;
@@ -2029,6 +2248,8 @@ function draw() {
     drawStreetBackground();
   } else if (currentScene === "xinzhuang") {
     drawXinzhuangBackground();
+  } else if (currentScene === "matchClub") {
+    drawMatchClubBackground();
   }
 
   ctx.save();
@@ -2039,6 +2260,8 @@ function draw() {
   } else if (currentScene === "xinzhuang") {
     drawQiaoXinBoss();
     drawShangShengNpc();
+  } else if (currentScene === "matchClub") {
+    drawHongZhuWeiNpc();
   }
 
   platforms.forEach(p => {
@@ -2048,7 +2271,7 @@ function draw() {
       ctx.fillStyle = "#ffffff";
       for (let z = 0; z < p.w; z += 90) ctx.fillRect(p.x + z, p.y + 15, 45, 8);
     } else {
-      ctx.fillStyle = currentScene === "street" ? "#00b894" : "#e84393";
+      ctx.fillStyle = currentScene === "street" ? "#00b894" : (currentScene === "xinzhuang" ? "#e84393" : "#fd79a8");
       ctx.fillRect(p.x, p.y, p.w, 3);
     }
   });
@@ -2089,7 +2312,47 @@ function draw() {
 
   enemies.forEach(en => {
     if (en.alive) {
-      if (en.type === "betelNutGangster") drawBetelNutGangster(en.x, en.y, en.w, en.h);
+      if (en.type === "muscleMan" || en.type === "nakedMan") {
+        ctx.fillStyle = en.type === "muscleMan" ? "#d35400" : "#ff7675";
+        ctx.beginPath();
+        ctx.roundRect(en.x + 8, en.y + 20, en.w - 16, en.h - 20, 10);
+        ctx.fill();
+        ctx.fillStyle = "#fdcb6e";
+        ctx.beginPath();
+        ctx.arc(en.x + en.w / 2, en.y + 16, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#2d3436";
+        ctx.fillRect(en.x + 10, en.y + en.h - 10, en.w - 20, 10);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 12px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(en.type === "muscleMan" ? "健壯猛男" : "狂熱裸男", en.x + en.w / 2, en.y - 6);
+      } else if (en.type === "hotdogStretch" || en.type === "hotdogVertical") {
+        ctx.shadowColor = "#e74c3c";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = "#d63031";
+        ctx.beginPath();
+        ctx.roundRect(en.x, en.y, en.w, en.h, 16);
+        ctx.fill();
+        ctx.strokeStyle = "#f1c40f";
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(en.x + 8, en.y + en.h / 2);
+        ctx.lineTo(en.x + en.w - 8, en.y + en.h / 2);
+        ctx.stroke();
+      } else if (en.type === "hotdogStick") {
+        ctx.save();
+        ctx.translate(en.x + en.w / 2, en.y + en.h / 2);
+        ctx.rotate(en.stickAngle || 0);
+        ctx.fillStyle = "#c0392b";
+        ctx.beginPath();
+        ctx.roundRect(-en.w / 2, -en.h / 2, en.w, en.h, 12);
+        ctx.fill();
+        ctx.strokeStyle = "#f1c40f";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(-en.w / 2 + 4, -en.h / 2 + 4, en.w - 8, en.h - 8);
+        ctx.restore();
+      } else if (en.type === "betelNutGangster") drawBetelNutGangster(en.x, en.y, en.w, en.h);
       else if (en.type === "eightGenerals") drawEightGenerals(en.x, en.y, en.w, en.h);
       else if (en.type === "drunkard") drawDrunkard(en.x, en.y, en.w, en.h);
       else if (en.type === "bikerGang") drawBikerGang(en.x, en.y, en.w, en.h);
