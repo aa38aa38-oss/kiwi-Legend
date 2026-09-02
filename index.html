@@ -346,7 +346,7 @@
         <div class="chapter-title">👑 aa38 專屬章節選擇</div>
         <div class="chapter-list">
           <button class="chapter-item-btn" onclick="startGameAtChapter(1)">🏙️ 第一章：正義北路街區冒險 (起點)</button>
-          <button class="chapter-item-btn" onclick="startGameAtChapter(2)">🔥 第二章：新莊討伐戰 (黑化巧馨)</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(2)">🔥 第二章：新莊討伐戰 (黑化 新莊王 巧馨)</button>
         </div>
         <button class="chapter-close-btn" onclick="closeChapterModal()">關閉選單</button>
       </div>
@@ -784,8 +784,8 @@ function triggerBossDefeatDialogue() {
 
   showDialogue(
     "💥 三重檳榔王 BOSS 慘敗",
-    "<span><span style='font-size: 40px; color: #e74c3c; font-weight: 900;'>「贏我又怎樣，要打得贏新莊巧馨嗎？」</span><br><br>（轟隆一聲！檳榔王 BOSS 爆裂掛掉，前方通道開啟！）</span>",
-    `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); streetCleared = true; document.getElementById('qualify-txt').innerText = '🔥 三重平定！前往新莊！';">🔥 前往巧馨的所在地 新莊！</button>`
+    "<span><span style='font-size: 40px; color: #e74c3c; font-weight: 900;'>「贏我又怎樣，要打得贏新莊王 巧馨嗎？」</span><br><br>（轟隆一聲！檳榔王 BOSS 爆裂掛掉，前方通道開啟！）</span>",
+    `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); streetCleared = true; document.getElementById('qualify-txt').innerText = '🔥 三重平定！前往新莊！';">🔥 前往 新莊王 巧馨 的所在地 新莊！</button>`
   );
 }
 
@@ -882,7 +882,7 @@ function triggerChenCouple() {
   chenCoupleTriggered = true;
   showDialogue(
     "👫 莫內花園的陳氏夫妻",
-    "<span>「奇異果勇者！新莊現在很危險，我們天天都被<b>巧馨</b>霸凌，她讓新莊到處都變成黑店，民不聊生啊！」</span>",
+    "<span>「奇異果勇者！新莊現在很危險，我們天天都被<b>新莊王 巧馨</b>霸凌，她讓新莊到處都變成黑店，民不聊生啊！」</span>",
     `<button class="dialog-btn btn-opt2" onclick="closeDialogue()">🛡️ 交給我來處理！</button>`
   );
 }
@@ -908,7 +908,7 @@ function triggerShangSheng() {
 function acceptShangShengMoney() {
   money += 10000;
   updateMoneyUI();
-  shangshengNpc.visible = false;
+  // 保持上昇背影常駐，不設定 shangshengNpc.visible = false
   closeDialogue();
 }
 
@@ -976,21 +976,21 @@ function showBigTransformDialogue2() {
   showDialogue(
     "🐶 巨大化奇異果",
     "<span><div style='font-size: 48px; font-weight: 900; color: #f1c40f; text-align: center; padding: 10px 0; text-shadow: 2px 2px 0 #000;'>「金～色～狂～風～～～！！！」</div></span>",
-    `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">⚔️ 迎戰新莊巧馨！</button>`
+    `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">⚔️ 迎戰 新莊王 巧馨！</button>`
   );
 }
 
 function triggerQiaoXinBoss() {
   qiaoXinBossTriggered = true;
   showDialogue(
-    "👑 新莊巧馨 (本體)",
-    "<span><div style='font-size: 40px; font-weight: 900; color: #000; text-align: center;'>「我是黑店巧馨的心臟！」</div><br>黑化力量正在劇烈跳動，準備好被黑店的垃圾袋淹沒了嗎？</span>",
+    "👑 新莊王 巧馨 (本體)",
+    "<span><div style='font-size: 40px; font-weight: 900; color: #000; text-align: center;'>「我是黑店 新莊王 巧馨 的心臟！」</div><br>黑化力量正在劇烈跳動，準備好被黑店的垃圾袋淹沒了嗎？</span>",
     `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); startQiaoXinFight();">⚔️ 決一死戰！</button>`
   );
 }
 
 function startQiaoXinFight() {
-  document.getElementById("qualify-txt").innerText = "🔥 最終決戰！攻擊【黑化跳動之心】摧毀巧馨！";
+  document.getElementById("qualify-txt").innerText = "🔥 最終決戰！攻擊【黑化跳動之心】摧毀 新莊王 巧馨！";
   document.getElementById("qualify-txt").style.color = "#d63031";
 }
 
@@ -1200,10 +1200,10 @@ function update() {
           if (qiaoXinHp <= 0) {
             qiaoXinHp = 0;
             qiaoXinBossDefeated = true;
-            document.getElementById("qualify-txt").innerText = "🎉 成功擊碎巧馨黑心臟！新莊重獲和平！";
+            document.getElementById("qualify-txt").innerText = "🎉 成功擊碎 新莊王 巧馨 黑心臟！新莊重獲和平！";
             document.getElementById("qualify-txt").style.color = "#27ae60";
             createExplosion(8750, 160, true);
-            showDialogue("🏆 勝利", "<span><span style='font-size: 40px; color: #f1c40f;'>「不愧是大老二！！！」</span><br><br>黑化的跳動心臟已徹底碎裂，你成功拯救了新莊！</span>", `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">太神啦！</button>`);
+            showDialogue("🏆 勝利", "<span><span style='font-size: 40px; color: #f1c40f;'>「不愧是大老二！！！」</span><br><br>新莊王 巧馨 黑化的跳動心臟已徹底碎裂，你成功拯救了新莊！</span>", `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">太神啦！</button>`);
           }
         }
       }
@@ -1362,10 +1362,10 @@ function update() {
           if (qiaoXinHp <= 0) {
             qiaoXinHp = 0;
             qiaoXinBossDefeated = true;
-            document.getElementById("qualify-txt").innerText = "🎉 成功擊碎巧馨黑心臟！新莊重獲和平！";
+            document.getElementById("qualify-txt").innerText = "🎉 成功擊碎 新莊王 巧馨 黑心臟！新莊重獲和平！";
             document.getElementById("qualify-txt").style.color = "#27ae60";
             createExplosion(8750, 160, true);
-            showDialogue("🏆 勝利", "<span><span style='font-size: 40px; color: #f1c40f;'>「不愧是大老二！！！」</span><br><br>黑化的跳動心臟已徹底碎裂，你成功拯救了新莊！</span>", `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">太神啦！</button>`);
+            showDialogue("🏆 勝利", "<span><span style='font-size: 40px; color: #f1c40f;'>「不愧是大老二！！！」</span><br><br>新莊王 巧馨 黑化的跳動心臟已徹底碎裂，你成功拯救了新莊！</span>", `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">太神啦！</button>`);
           }
         }
       }
@@ -1678,11 +1678,11 @@ function drawQiaoXinBoss() {
 
   ctx.restore();
 
-  // BOSS 標籤與血量條
+  // BOSS 標籤與血量條 (標明稱號：新莊王 巧馨)
   ctx.fillStyle = "#e84393";
   ctx.font = "bold 32px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("🖤 巧馨．黑化跳動之心 🖤", centerX, 320);
+  ctx.fillText("🖤 新莊王 巧馨．黑化跳動之心 🖤", centerX, 320);
 
   const bBarX = 8550, bBarY = 15, bBarW = 400, bBarH = 16;
   ctx.fillStyle = "#000";
@@ -1694,7 +1694,7 @@ function drawQiaoXinBoss() {
   ctx.strokeRect(bBarX, bBarY, bBarW, bBarH);
   ctx.fillStyle = "#fff";
   ctx.font = "bold 14px sans-serif";
-  ctx.fillText("【黑化巧馨之心】", bBarX + bBarW / 2, bBarY - 8);
+  ctx.fillText("【黑化 新莊王 巧馨之心】", bBarX + bBarW / 2, bBarY - 8);
   ctx.restore();
 }
 
@@ -1725,7 +1725,7 @@ function drawPicDrop(x, y, w, h, angle) {
   ctx.restore();
 }
 
-// 繪製上昇 NPC (背影.png)
+// 繪製上昇 NPC (背影.png，對話後持續常駐)
 function drawShangShengNpc() {
   if (!shangshengNpc.visible || currentScene !== "xinzhuang") return;
   ctx.save();
@@ -1735,7 +1735,6 @@ function drawShangShengNpc() {
   if (shangshengImg.complete && shangshengImg.naturalWidth > 0) {
     ctx.drawImage(shangshengImg, shangshengNpc.x, shangshengNpc.y, shangshengNpc.w, shangshengNpc.h);
   } else {
-    // 預留備用圖塊
     ctx.fillStyle = "#34495e";
     ctx.beginPath();
     ctx.roundRect(shangshengNpc.x, shangshengNpc.y, shangshengNpc.w, shangshengNpc.h, 12);
@@ -1746,11 +1745,15 @@ function drawShangShengNpc() {
     ctx.fillText("上昇 (背影)", shangshengNpc.x + shangshengNpc.w / 2, shangshengNpc.y + 70);
   }
 
-  // 提示光標
+  // 根據是否已交談過顯示狀態提示
   ctx.fillStyle = "#f1c40f";
   ctx.font = "bold 16px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("💬 碰我交談", shangshengNpc.x + shangshengNpc.w / 2, shangshengNpc.y - 10);
+  if (!shangshengTriggered) {
+    ctx.fillText("💬 碰我交談", shangshengNpc.x + shangshengNpc.w / 2, shangshengNpc.y - 10);
+  } else {
+    ctx.fillText("✨ 上昇大哥", shangshengNpc.x + shangshengNpc.w / 2, shangshengNpc.y - 10);
+  }
   ctx.restore();
 }
 
