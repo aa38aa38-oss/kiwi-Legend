@@ -156,7 +156,7 @@
     display: none;
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.88);
     z-index: 120;
     flex-direction: column;
     align-items: center;
@@ -168,16 +168,26 @@
     border: 3px solid #f1c40f;
     border-radius: 14px;
     padding: 18px 20px;
-    width: 92%;
-    max-width: 440px;
+    width: 94%;
+    max-width: 480px;
+    max-height: 86vh;
+    display: flex;
+    flex-direction: column;
     text-align: center;
     box-shadow: 0 8px 24px rgba(0,0,0,0.6);
   }
-  .chapter-title { font-size: 18px; font-weight: bold; color: #f1c40f; margin-bottom: 14px; }
-  .chapter-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .chapter-title { font-size: 18px; font-weight: bold; color: #f1c40f; margin-bottom: 12px; }
+  .chapter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
   .chapter-item-btn {
     padding: 10px 14px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     color: #fff;
     background: #353b48;
@@ -185,10 +195,14 @@
     border-radius: 8px;
     cursor: pointer;
     text-align: left;
+    transition: background 0.15s;
   }
-  .chapter-item-btn:hover, .chapter-item-btn:active { background: #e84393; border-color: #ff7675; }
+  .chapter-item-btn:hover, .chapter-item-btn:active {
+    background: #e84393;
+    border-color: #ff7675;
+  }
   .chapter-close-btn {
-    padding: 6px 18px;
+    padding: 8px 18px;
     font-size: 13px;
     font-weight: bold;
     background: #718093;
@@ -196,6 +210,7 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    align-self: center;
   }
 
   #dialog-box {
@@ -343,10 +358,13 @@
 
     <div id="chapter-modal">
       <div class="chapter-card">
-        <div class="chapter-title">👑 aa38 專屬章節選擇</div>
+        <div class="chapter-title">👑 aa38 專屬章節與關卡傳送</div>
         <div class="chapter-list">
           <button class="chapter-item-btn" onclick="startGameAtChapter(1)">🏙️ 第一章：正義北路街區冒險 (起點)</button>
-          <button class="chapter-item-btn" onclick="startGameAtChapter(2)">🔥 第二章：新莊討伐戰 (黑化 新莊王 巧馨)</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(1.5)">👺 第一章決戰：直達【三重檳榔王 BOSS】</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(2)">🔥 第二章：新莊討伐戰 (街區起點)</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(2.3)">🤝 第二章中期：直達【上昇大哥會合點】</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(2.5)">🖤 第二章決戰：直達【新莊王 巧馨 黑心祭壇】</button>
         </div>
         <button class="chapter-close-btn" onclick="closeChapterModal()">關閉選單</button>
       </div>
@@ -565,11 +583,38 @@ function startGameAtChapter(ch) {
 
   if (ch === 1) {
     enterSanchong();
+  } else if (ch === 1.5) {
+    enterSanchong();
+    player.x = 4250;
+    cameraX = 4000;
   } else if (ch === 2) {
     player.scale = 1.0;
     targetScale = 1.0;
     applyPlayerSize();
     enterXinzhuang();
+  } else if (ch === 2.3) {
+    player.scale = 1.0;
+    targetScale = 1.0;
+    applyPlayerSize();
+    enterXinzhuang();
+    player.x = 4380;
+    cameraX = 4100;
+    chenCoupleTriggered = true;
+    fruitKing1Triggered = true;
+  } else if (ch === 2.5) {
+    player.scale = 1.5;
+    targetScale = 1.5;
+    applyPlayerSize();
+    hasPlayerPic = true;
+    enterXinzhuang();
+    player.x = 7950;
+    cameraX = 7700;
+    chenCoupleTriggered = true;
+    fruitKing1Triggered = true;
+    shangshengTriggered = true;
+    fruitKing2Triggered = true;
+    money = 10000;
+    updateMoneyUI();
   }
 }
 
@@ -908,7 +953,6 @@ function triggerShangSheng() {
 function acceptShangShengMoney() {
   money += 10000;
   updateMoneyUI();
-  // 保持上昇背影常駐，不設定 shangshengNpc.visible = false
   closeDialogue();
 }
 
@@ -1151,7 +1195,6 @@ function update() {
     if (player.x >= 1000 && !chenCoupleTriggered) triggerChenCouple();
     if (player.x >= 2500 && !fruitKing1Triggered) triggerFruitKing1();
 
-    // 碰撞到上昇背影照片觸發對話
     if (shangshengNpc.visible && !shangshengTriggered) {
       if (player.x + player.w > shangshengNpc.x && player.x < shangshengNpc.x + shangshengNpc.w &&
           player.y + player.h > shangshengNpc.y && player.y < shangshengNpc.y + shangshengNpc.h) {
@@ -1635,7 +1678,6 @@ function drawQiaoXinBoss() {
   const centerY = 160;
   const pulse = 1 + Math.sin(heartBeatTimer * 4) * 0.12;
 
-  // 暗黑能量擴散光暈
   ctx.shadowColor = "#8e44ad";
   ctx.shadowBlur = 35 * pulse;
   ctx.strokeStyle = "rgba(142, 68, 173, 0.4)";
@@ -1644,7 +1686,6 @@ function drawQiaoXinBoss() {
   ctx.arc(centerX, centerY, 130 * pulse, 0, Math.PI * 2);
   ctx.stroke();
 
-  // 繪製黑化跳動之心本體 (無臉造型)
   ctx.save();
   ctx.translate(centerX, centerY);
   ctx.scale(pulse, pulse);
@@ -1663,7 +1704,6 @@ function drawQiaoXinBoss() {
   ctx.fill();
   ctx.stroke();
 
-  // 心臟暗紅脈絡
   ctx.strokeStyle = "#e74c3c";
   ctx.lineWidth = 3;
   ctx.beginPath();
@@ -1671,14 +1711,12 @@ function drawQiaoXinBoss() {
   ctx.moveTo(15, -45); ctx.lineTo(35, -15); ctx.lineTo(10, 8);
   ctx.stroke();
 
-  // 上方延伸的暗黑血管
   ctx.fillStyle = "#2c2c34";
   ctx.fillRect(-35, -95, 20, 45);
   ctx.fillRect(15, -95, 20, 45);
 
   ctx.restore();
 
-  // BOSS 標籤與血量條 (標明稱號：新莊王 巧馨)
   ctx.fillStyle = "#e84393";
   ctx.font = "bold 32px sans-serif";
   ctx.textAlign = "center";
@@ -1725,7 +1763,6 @@ function drawPicDrop(x, y, w, h, angle) {
   ctx.restore();
 }
 
-// 繪製上昇 NPC (背影.png，對話後持續常駐)
 function drawShangShengNpc() {
   if (!shangshengNpc.visible || currentScene !== "xinzhuang") return;
   ctx.save();
@@ -1745,7 +1782,6 @@ function drawShangShengNpc() {
     ctx.fillText("上昇 (背影)", shangshengNpc.x + shangshengNpc.w / 2, shangshengNpc.y + 70);
   }
 
-  // 根據是否已交談過顯示狀態提示
   ctx.fillStyle = "#f1c40f";
   ctx.font = "bold 16px sans-serif";
   ctx.textAlign = "center";
@@ -2181,11 +2217,9 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
     keys.down = true;
   }
-  // 跳躍：支援 C、K、空白鍵、W、方向鍵上
   if (e.key === "c" || e.key === "C" || e.key === "k" || e.key === "K" || e.key === " " || e.key === "w" || e.key === "W" || e.key === "ArrowUp") {
     triggerJump();
   }
-  // 斬擊/攻擊：支援 X、J、Z
   if (e.key === "x" || e.key === "X" || e.key === "j" || e.key === "J" || e.key === "z" || e.key === "Z") {
     triggerAttack();
   }
