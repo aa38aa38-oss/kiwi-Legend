@@ -137,18 +137,26 @@
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
   }
 
+  /* 手機直立模式：縮小首頁選單並移至畫面最底部，避免擋住標題與主角圖檔 */
   @media (max-aspect-ratio: 1/1) {
     .title-menu-box {
-      top: 37%;
-      width: 82%;
-      padding: 8px 12px;
-      gap: 8px;
-      border-radius: 26px;
+      top: auto;
+      bottom: 8px;
+      transform: none;
+      width: 76%;
+      max-width: 340px;
+      padding: 5px 8px;
+      gap: 6px;
+      border-radius: 20px;
+      border-width: 2px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
     }
     .title-btn {
-      padding: 9px 8px;
-      font-size: 13px;
-      border-radius: 16px;
+      padding: 5px 8px;
+      font-size: 11.5px;
+      border-radius: 12px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.35);
+      letter-spacing: 0;
     }
   }
 
@@ -1292,9 +1300,6 @@ function update() {
     }
     if (player.x >= 8000 && !qiaoXinBossTriggered) triggerQiaoXinBoss();
 
-    // ------------------------------------
-    // 新莊王 巧馨 BOSS戰 強化攻擊手段與敵人召喚
-    // ------------------------------------
     if (qiaoXinBossTriggered && !qiaoXinBossDefeated) {
       const isEnraged = (qiaoXinHp < qiaoXinMaxHp * 0.5);
       const attackInterval = isEnraged ? 20 : 28;
@@ -1303,7 +1308,6 @@ function update() {
       if (qiaoXinAttackTimer > attackInterval) {
         qiaoXinAttackTimer = 0;
 
-        // 攻擊型態 1：大量黑化垃圾袋群向下傾瀉 (3 ~ 5 個)
         const waveCount = isEnraged ? 4 : 3;
         for (let k = 0; k < waveCount; k++) {
           projectiles.push({
@@ -1317,7 +1321,6 @@ function update() {
           });
         }
 
-        // 攻擊型態 2：黑心臟本體向玩家方向噴射追擊黑氣彈
         const heartCenterX = 8750;
         const heartCenterY = 160;
         const targetDirX = player.x - heartCenterX;
@@ -1336,7 +1339,6 @@ function update() {
         });
       }
 
-      // BOSS持續召喚敵人機制：維持戰場壓迫感 (上限 7 隻)
       qiaoXinSpawnTimer++;
       const currentBossEnemies = enemies.filter(en => en.alive && en.x >= 8000).length;
       const spawnInterval = isEnraged ? 90 : 130;
@@ -1345,7 +1347,6 @@ function update() {
         qiaoXinSpawnTimer = 0;
         const spawnTypeRand = Math.random();
         if (spawnTypeRand < 0.45) {
-          // 召喚棒球打手
           enemies.push({
             type: "baseballBatter",
             x: 8200 + Math.random() * 500,
@@ -1357,7 +1358,6 @@ function update() {
             alive: true
           });
         } else if (spawnTypeRand < 0.75) {
-          // 召喚投球流氓
           enemies.push({
             type: "baseballThrower",
             x: 8300 + Math.random() * 450,
@@ -1369,7 +1369,6 @@ function update() {
             alive: true, attackTimer: 30
           });
         } else {
-          // 召喚空中猛禽
           enemies.push({
             type: "diveBird",
             x: 8700,
@@ -2128,7 +2127,6 @@ function draw() {
       ctx.roundRect(p.x - bagSize / 2, p.y - bagSize / 2, bagSize, bagSize, 6);
       ctx.fill();
 
-      // 垃圾袋扎口細節
       ctx.fillStyle = "#e84393";
       ctx.fillRect(p.x - 3, p.y - bagSize / 2 - 3, 6, 4);
     } else if (p.isBaseball) {
