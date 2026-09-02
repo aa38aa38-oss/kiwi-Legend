@@ -583,7 +583,7 @@ let qiaoXinAttackTimer = 0;
 let qiaoXinSpawnTimer = 0;
 let heartBeatTimer = 0;
 
-// 上昇實體物件：放大1.7倍 (寬204, 高221, y座標貼地設為159)
+// 上昇實體物件
 let shangshengNpc = {
   x: 4500,
   y: 159,
@@ -602,7 +602,7 @@ let hotDogKingMaxHp = 35000;
 let hotDogKingAttackTimer = 0;
 let matchClubDiscoTimer = 0;
 
-// 林口洪主委 (寬250, 高280, y座標貼地設為100)
+// 林口洪主委
 let hongZhuWeiNpc = {
   x: 2400,
   y: 100,
@@ -611,7 +611,7 @@ let hongZhuWeiNpc = {
   visible: true
 };
 
-// 皇上 (寬160, 高220, y座標貼地設為160)
+// 皇上
 let huangShangNpc = {
   x: 5600,
   y: 160,
@@ -620,11 +620,11 @@ let huangShangNpc = {
   visible: true
 };
 
-// 熱狗王BOSS實體
+// 熱狗王BOSS實體 (設定在 8550 處，穩妥站在地面上)
 let hotDogBossEntity = {
-  x: 8600,
-  y: 140,
-  w: 220,
+  x: 8550,
+  y: 150,
+  w: 230,
   h: 230
 };
 
@@ -764,17 +764,18 @@ function startGameAtChapter(ch) {
     enterMatchClub();
   } else if (ch === 3.2) {
     enterMatchClub();
-    player.x = 2250;
+    player.x = 2200;
     cameraX = 2000;
   } else if (ch === 3.4) {
     enterMatchClub();
-    player.x = 5400;
-    cameraX = 5200;
+    player.x = 5350;
+    cameraX = 5100;
     hongZhuWeiTriggered = true;
   } else if (ch === 3.6) {
     enterMatchClub();
-    player.x = 8350;
-    cameraX = 8100;
+    // 傳送到安全地面上，並保持足夠距離迎戰
+    player.x = 8100;
+    cameraX = 7900;
     hongZhuWeiTriggered = true;
     huangShangTriggered = true;
   }
@@ -1209,7 +1210,8 @@ function startQiaoXinFight() {
 // ----------------------------------------
 function enterMatchClub() {
   currentScene = "matchClub";
-  mapWidth = 10000;
+  // 地圖全面拓展至 10500，確保熱狗王區域有充足地面
+  mapWidth = 10500;
   cameraX = 0;
   isDialogueOpen = false;
   document.getElementById("dialog-box").style.display = "none";
@@ -1236,10 +1238,14 @@ function enterMatchClub() {
   hotDogKingDefeated = false;
   hotDogKingHp = 35000;
 
-  platforms = [ { x: 0, y: 380, w: 10000, h: 70, color: "#1f142e" } ];
-  for (let i = 1; i < 30; i++) {
-    platforms.push({ x: 300 * i, y: 380 - (i % 3) * 45, w: 140, h: 18, color: "#8e44ad" });
+  // 延伸底層平台到 10500，徹底解決掉下深淵消失的問題
+  platforms = [ { x: 0, y: 380, w: 10500, h: 70, color: "#1f142e" } ];
+  for (let i = 1; i < 35; i++) {
+    platforms.push({ x: 280 * i, y: 380 - (i % 3) * 45, w: 150, h: 18, color: "#8e44ad" });
   }
+  // 在熱狗王前加設跳躍台
+  platforms.push({ x: 8200, y: 300, w: 160, h: 18, color: "#fd79a8" });
+  platforms.push({ x: 8400, y: 220, w: 160, h: 18, color: "#fd79a8" });
 
   cityProps = [
     { x: 300, y: 90, w: 30, h: 100, text: "MATCH CLUB", bg: "#fd79a8", isBigPlacard: true },
@@ -1287,7 +1293,6 @@ function shoutAtHongZhuWei() {
   document.getElementById("qualify-txt").innerText = "⚡ 七彩霓虹燈瘋狂閃爍！天旋地轉！多型態熱狗大軍四面突襲！";
   document.getElementById("qualify-txt").style.color = "#ff7675";
 
-  // 召喚左右伸縮、上下彈跳、雙節甩棍三種熱狗
   for (let i = 0; i < 15; i++) {
     const subType = (i % 3 === 0 ? "hotdogStretch" : (i % 3 === 1 ? "hotdogVertical" : "hotdogStick"));
     enemies.push({
@@ -1649,7 +1654,7 @@ function update() {
   }
   // 第三章：Match Club
   else if (currentScene === "matchClub") {
-    // 洪主委
+    // 洪主委對話觸發
     if (hongZhuWeiNpc.visible && !hongZhuWeiTriggered) {
       if (player.x + player.w > hongZhuWeiNpc.x && player.x < hongZhuWeiNpc.x + hongZhuWeiNpc.w &&
           player.y + player.h > hongZhuWeiNpc.y && player.y < hongZhuWeiNpc.y + hongZhuWeiNpc.h) {
@@ -1657,7 +1662,7 @@ function update() {
       }
     }
 
-    // 皇上微服出巡
+    // 皇上微服出巡對話觸發
     if (huangShangNpc.visible && !huangShangTriggered) {
       if (player.x + player.w > huangShangNpc.x && player.x < huangShangNpc.x + huangShangNpc.w &&
           player.y + player.h > huangShangNpc.y && player.y < huangShangNpc.y + huangShangNpc.h) {
@@ -1665,7 +1670,7 @@ function update() {
       }
     }
 
-    // 熱狗王BOSS觸發
+    // 熱狗王BOSS觸發 (到達 8200 觸發)
     if (player.x >= 8200 && !hotDogKingTriggered) {
       triggerHotDogKingBoss();
     }
@@ -1679,7 +1684,7 @@ function update() {
         for (let k = 0; k < 4; k++) {
           const angle = Math.PI * 0.75 + (Math.random() * Math.PI * 0.5);
           projectiles.push({
-            x: hotDogBossEntity.x + 60,
+            x: hotDogBossEntity.x + 40,
             y: hotDogBossEntity.y + 100,
             vx: -Math.cos(angle) * (6 + Math.random() * 4),
             vy: Math.sin(angle) * (5 + Math.random() * 3),
@@ -1697,7 +1702,7 @@ function update() {
 
         if (slashBoxX < bossHitX + bossHitW && slashBoxX + slashBoxW > bossHitX &&
             player.y < bossHitY + bossHitH && player.y + player.h > bossHitY) {
-          hotDogKingHp -= 60;
+          hotDogKingHp -= (player.scale > 1.2 ? 80 : 45);
           createExplosion(bossHitX + 110, bossHitY + 115, true);
           if (hotDogKingHp <= 0) {
             triggerHotDogKingDefeat();
@@ -2314,7 +2319,7 @@ function drawShangShengNpc() {
   ctx.restore();
 }
 
-// 繪製林口洪主委 (裸男.png) - 放大2倍 (寬250, 高280)
+// 繪製林口洪主委 (裸男.png)
 function drawHongZhuWeiNpc() {
   if (currentScene !== "matchClub" || !hongZhuWeiNpc.visible) return;
   ctx.save();
@@ -2382,7 +2387,7 @@ function drawHuangShangNpc() {
   ctx.restore();
 }
 
-// 繪製熱狗王 BOSS (熱狗王1.png / 熱狗王2.png 動態姿態切換)
+// 繪製熱狗王 BOSS (強固繪製機制，圖片載入中亦有完整輪廓與血條)
 function drawHotDogKingBoss() {
   if (currentScene !== "matchClub" || !hotDogKingTriggered || hotDogKingDefeated) return;
   ctx.save();
@@ -2390,26 +2395,47 @@ function drawHotDogKingBoss() {
 
   ctx.shadowColor = "#e74c3c";
   ctx.shadowBlur = 30;
+
   if (currentHotdogImg.complete && currentHotdogImg.naturalWidth > 0) {
     ctx.drawImage(currentHotdogImg, hotDogBossEntity.x, hotDogBossEntity.y, hotDogBossEntity.w, hotDogBossEntity.h);
   } else {
-    ctx.fillStyle = "#c0392b";
+    // 強化備用渲染
+    ctx.fillStyle = "#d63031";
     ctx.beginPath();
-    ctx.roundRect(hotDogBossEntity.x, hotDogBossEntity.y, hotDogBossEntity.w, hotDogBossEntity.h, 20);
+    ctx.roundRect(hotDogBossEntity.x, hotDogBossEntity.y, hotDogBossEntity.w, hotDogBossEntity.h, 28);
     ctx.fill();
+    ctx.strokeStyle = "#f1c40f";
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    // 霸氣發光眼
+    ctx.fillStyle = "#f1c40f";
+    ctx.beginPath();
+    ctx.arc(hotDogBossEntity.x + 65, hotDogBossEntity.y + 70, 18, 0, Math.PI * 2);
+    ctx.arc(hotDogBossEntity.x + 165, hotDogBossEntity.y + 70, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    ctx.arc(hotDogBossEntity.x + 65, hotDogBossEntity.y + 70, 8, 0, Math.PI * 2);
+    ctx.arc(hotDogBossEntity.x + 165, hotDogBossEntity.y + 70, 8, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 22px sans-serif";
+    ctx.font = "bold 24px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("熱狗王 BOSS", hotDogBossEntity.x + hotDogBossEntity.w / 2, hotDogBossEntity.y + 110);
+    ctx.fillText("熱狗王 BOSS", hotDogBossEntity.x + hotDogBossEntity.w / 2, hotDogBossEntity.y + 140);
   }
 
   // BOSS 標籤與血量條
   ctx.fillStyle = "#ff7675";
   ctx.font = "bold 32px sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("🌭 歡場霸王．熱狗王 BOSS 🌭", hotDogBossEntity.x + hotDogBossEntity.w / 2, hotDogBossEntity.y - 30);
+  ctx.fillText("🌭 歡場霸王．熱狗王 BOSS 🌭", hotDogBossEntity.x + hotDogBossEntity.w / 2, hotDogBossEntity.y - 25);
 
-  const bBarX = 8550, bBarY = 15, bBarW = 400, bBarH = 16;
+  const bBarX = hotDogBossEntity.x - 85;
+  const bBarY = 20;
+  const bBarW = 400;
+  const bBarH = 16;
   ctx.fillStyle = "#000";
   ctx.fillRect(bBarX - 4, bBarY - 4, bBarW + 8, bBarH + 8);
   ctx.fillStyle = "#e74c3c";
@@ -2420,76 +2446,6 @@ function drawHotDogKingBoss() {
   ctx.fillStyle = "#fff";
   ctx.font = "bold 14px sans-serif";
   ctx.fillText("【歡場熱狗之王】", bBarX + bBarW / 2, bBarY - 8);
-  ctx.restore();
-}
-
-function drawMegaManHealthBar() {
-  const barX = 14;
-  const barY = 16;
-  const barW = 16;
-  const totalBlocks = 28;
-  const blockH = 4;
-  const blockGap = 1;
-  const barH = totalBlocks * (blockH + blockGap) + 4;
-  const isLowHp = (hp <= 21 && hp > 0);
-  const flashState = Math.sin(hpFlashTimer * 4) > 0;
-
-  ctx.save();
-  if (isLowHp) {
-    ctx.shadowColor = "#ff0000";
-    ctx.shadowBlur = 16;
-  }
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(barX - 2, barY - 2, barW + 4, barH + 4);
-  ctx.fillStyle = isLowHp && flashState ? "#4b1111" : "#4a4a4a";
-  ctx.fillRect(barX, barY, barW, barH);
-
-  const activeBlocks = Math.ceil((Math.max(0, hp) / 100) * totalBlocks);
-  for (let i = 0; i < totalBlocks; i++) {
-    const by = barY + barH - 4 - (i + 1) * (blockH + blockGap);
-    if (i < activeBlocks) {
-      if (isLowHp) {
-        ctx.fillStyle = flashState ? "#ff0000" : "#ffffff";
-        ctx.fillRect(barX + 2, by, barW - 4, blockH);
-        ctx.fillStyle = flashState ? "#ffffff" : "#ff7675";
-        ctx.fillRect(barX + 3, by + 1, 2, 2);
-      } else {
-        ctx.fillStyle = i % 2 === 0 ? "#f1c40f" : "#f39c12";
-        ctx.fillRect(barX + 2, by, barW - 4, blockH);
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(barX + 3, by + 1, 2, 2);
-      }
-    } else {
-      ctx.fillStyle = "#222222";
-      ctx.fillRect(barX + 2, by, barW - 4, blockH);
-    }
-  }
-
-  ctx.fillStyle = isLowHp && flashState ? "#ff0000" : "#3498db";
-  ctx.fillRect(barX - 2, barY - 2, barW + 4, 3);
-  ctx.fillRect(barX - 2, barY + barH - 1, barW + 4, 3);
-
-  const logoX = barX - 6;
-  const logoY = barY + barH + 6;
-  const logoSize = 28;
-
-  ctx.fillStyle = "#000000";
-  ctx.beginPath();
-  ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2 + 2, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = isLowHp && flashState ? "#ff0000" : "#ff7675";
-  ctx.beginPath();
-  ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2, 0, Math.PI * 2);
-  ctx.fill();
-
-  if (playerImg.complete && playerImg.naturalWidth > 0) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2 - 2, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.drawImage(playerImg, playerImg.naturalWidth * 0.15, 0, playerImg.naturalWidth * 0.7, playerImg.naturalHeight * 0.5, logoX, logoY, logoSize, logoSize);
-    ctx.restore();
-  }
   ctx.restore();
 }
 
@@ -2527,7 +2483,7 @@ function draw() {
     }
   });
 
-  // 第三章角色立繪（在階梯完成後繪製，確保覆蓋於階梯上方）
+  // 第三章角色立繪在階梯之上繪製
   if (currentScene === "matchClub") {
     drawHongZhuWeiNpc();
     drawHuangShangNpc();
@@ -2543,7 +2499,7 @@ function draw() {
     ctx.roundRect(prop.x, prop.y, prop.w, prop.h, 6);
     ctx.fill();
     ctx.strokeStyle = prop.isBigPlacard ? "#f1c40f" : "#ffffff";
-    ctx.lineWidth = prop.isBigPlacard ? 3 : 2;
+    ctx.lineWidth = 3;
     ctx.stroke();
 
     ctx.fillStyle = "#ffffff";
@@ -2674,7 +2630,7 @@ function draw() {
       ctx.fillRect(p.x - 3, p.y - bagSize / 2 - 4, 6, 5);
     } else if (p.isHotDogBullet) {
       ctx.shadowColor = "#e74c3c";
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 16;
       ctx.fillStyle = "#e84393";
       ctx.beginPath();
       ctx.roundRect(p.x - 18, p.y - 9, 36, 18, 9);
