@@ -216,24 +216,61 @@
   #dialog-box {
     display: none;
     position: absolute;
-    bottom: 12px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
     width: 96%;
     max-width: 860px;
+    max-height: 90%;
     background: rgba(255, 255, 255, 0.98);
     border: 5px solid #ff7675;
     border-radius: 18px;
-    padding: 24px 28px;
+    padding: 20px 24px;
     box-shadow: 0 12px 35px rgba(0,0,0,0.5);
     z-index: 100;
+    overflow-y: auto;
   }
-  #dialog-title { font-size: 30px; font-weight: 900; color: #e84393; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
-  #dialog-text { font-size: 30px; font-weight: bold; color: #2d3436; line-height: 1.5; margin-bottom: 20px; }
-  .dialog-options { display: flex; gap: 14px; justify-content: flex-end; }
-  .dialog-btn { padding: 14px 24px; font-size: 30px; font-weight: 900; border-radius: 10px; border: none; cursor: pointer; }
+  #dialog-title { font-size: 26px; font-weight: 900; color: #e84393; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  #dialog-text { font-size: 24px; font-weight: bold; color: #2d3436; line-height: 1.45; margin-bottom: 16px; }
+  .dialog-options { display: flex; gap: 12px; justify-content: flex-end; }
+  .dialog-btn { padding: 12px 22px; font-size: 24px; font-weight: 900; border-radius: 10px; border: none; cursor: pointer; }
   .btn-opt1 { background: #e84393; color: #fff; }
   .btn-opt2 { background: #0984e3; color: #fff; }
+
+  @media (max-aspect-ratio: 1/1) {
+    #dialog-box {
+      bottom: 5px;
+      width: 96%;
+      max-height: 94%;
+      padding: 10px 12px;
+      border: 3px solid #ff7675;
+      border-radius: 12px;
+    }
+    #dialog-title {
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+    #dialog-text {
+      font-size: clamp(15px, 3.8vw, 18px);
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+    #dialog-text div,
+    #dialog-text span {
+      font-size: clamp(16px, 4.2vw, 20px) !important;
+      line-height: 1.3 !important;
+      padding: 4px 6px !important;
+    }
+    .dialog-options {
+      gap: 8px;
+    }
+    .dialog-btn {
+      padding: 8px 14px;
+      font-size: clamp(14px, 3.8vw, 17px);
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+  }
 
   .pad-left { display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .pad-row { display: flex; gap: 8px; }
@@ -829,7 +866,7 @@ function triggerBossEncounter() {
   bossTriggered = true;
   showDialogue(
     "👺 三重檳榔王 BOSS",
-    "<span>「小子，敢在三重撒野？<br><br><span style='font-size: 40px; color: #d63031; font-weight: 900;'>『要不要吃檳榔？』</span>」</span>",
+    "<span>「小子，敢在三重撒野？<br><br><span style='color: #d63031; font-weight: 900;'>『要不要吃檳榔？』</span>」</span>",
     `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); startBossFightAction();">⚔️ 少廢話，開打！</button>`
   );
 }
@@ -847,7 +884,7 @@ function triggerBossDefeatDialogue() {
 
   showDialogue(
     "💥 三重檳榔王 BOSS 慘敗",
-    "<span><span style='font-size: 40px; color: #e74c3c; font-weight: 900;'>「贏我又怎樣，要打得贏新莊王 巧馨嗎？」</span><br><br>（轟隆一聲！檳榔王 BOSS 爆裂掛掉，前方通道開啟！）</span>",
+    "<span><span style='color: #e74c3c; font-weight: 900;'>「贏我又怎樣，要打得贏新莊王 巧馨嗎？」</span><br><br>（轟隆一聲！檳榔王 BOSS 爆裂掛掉，前方通道開啟！）</span>",
     `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); streetCleared = true; document.getElementById('qualify-txt').innerText = '🔥 三重平定！前往新莊！';">🔥 前往 新莊王 巧馨 的所在地 新莊！</button>`
   );
 }
@@ -951,7 +988,7 @@ function triggerFruitKing1() {
   fruitKing1Triggered = true;
   showDialogue(
     "🍎 新店水果王",
-    `<span>「要買我的無敵水果嗎？先去跟前面的流氓搶錢，一個流氓只有 1 元，<span style='color:#e74c3c;'>湊齊 100 元</span>再來找我買水果！」<br><br><div style='background: #2d3436; border: 2px solid #f1c40f; border-radius: 10px; padding: 8px 16px; display: inline-block; color: #f1c40f; font-size: 32px; font-weight: 900;'>💰 目前持有金錢：$${money}</div></span>`,
+    `<span>「要買我的無敵水果嗎？先去跟前面的流氓搶錢，一個流氓只有 1 元，<span style='color:#e74c3c;'>湊齊 100 元</span>再來找我買水果！」<br><br><div style='background: #2d3436; border: 2px solid #f1c40f; border-radius: 8px; padding: 6px 12px; display: inline-block; color: #f1c40f; font-weight: 900;'>💰 持有金錢：$${money}</div></span>`,
     `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">💰 好，我去賺錢！</button>`
   );
 }
@@ -975,7 +1012,7 @@ function triggerFruitKing2() {
   fruitKing2Triggered = true;
   showDialogue(
     "🍎 新店水果王",
-    `<span>「看來你湊齊 100 元了，來吃我的無敵水果吧！」<br><br><div style='background: #2d3436; border: 2px solid #f1c40f; border-radius: 10px; padding: 8px 16px; display: inline-block; color: #f1c40f; font-size: 32px; font-weight: 900;'>💰 目前持有金錢：$${money}</div></span>`,
+    `<span>「看來你湊齊 100 元了，來吃我的無敵水果吧！」<br><br><div style='background: #2d3436; border: 2px solid #f1c40f; border-radius: 8px; padding: 6px 12px; display: inline-block; color: #f1c40f; font-weight: 900;'>💰 持有金錢：$${money}</div></span>`,
     `<button class="dialog-btn btn-opt2" onclick="rejectFruitAndShowEnemies()">🥝 (嫌棄) 你的水果根本沒用！</button>`
   );
 }
@@ -1026,7 +1063,7 @@ function rejectFruitAndShowEnemies() {
 function showBigTransformDialogue1() {
   showDialogue(
     "🐶 巨大化奇異果",
-    "<span><div style='font-size: 48px; font-weight: 900; color: #e84393; text-align: center; padding: 10px 0; text-shadow: 2px 2px 0 #000;'>「我～變～大～啦～～～！！！」</div></span>",
+    "<span><div style='font-weight: 900; color: #e84393; text-align: center; text-shadow: 2px 2px 0 #000;'>「我～變～大～啦～～～！！！」</div></span>",
     `<button class="dialog-btn btn-opt1" onclick="showBigTransformDialogue2()">🔥 繼續爆發！</button>`
   );
 }
@@ -1034,7 +1071,7 @@ function showBigTransformDialogue1() {
 function showBigTransformDialogue2() {
   showDialogue(
     "🐶 巨大化奇異果",
-    "<span><div style='font-size: 48px; font-weight: 900; color: #f1c40f; text-align: center; padding: 10px 0; text-shadow: 2px 2px 0 #000;'>「金～色～狂～風～～～！！！」</div></span>",
+    "<span><div style='font-weight: 900; color: #f1c40f; text-align: center; text-shadow: 2px 2px 0 #000;'>「金～色～狂～風～～～！！！」</div></span>",
     `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">⚔️ 迎戰 新莊王 巧馨！</button>`
   );
 }
@@ -1043,7 +1080,7 @@ function triggerQiaoXinBoss() {
   qiaoXinBossTriggered = true;
   showDialogue(
     "👑 新莊王 巧馨 (本體)",
-    "<span><div style='font-size: 40px; font-weight: 900; color: #000; text-align: center;'>「我是黑店 新莊王 巧馨 的心臟！」</div><br>黑化力量正在劇烈跳動，準備好被黑店的垃圾袋淹沒了嗎？</span>",
+    "<span><div style='font-weight: 900; color: #000; text-align: center;'>「我是黑店 新莊王 巧馨 的心臟！」</div><br>黑化力量正在劇烈跳動，準備好被黑店的垃圾袋淹沒了嗎？</span>",
     `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); startQiaoXinFight();">⚔️ 決一死戰！</button>`
   );
 }
@@ -1221,7 +1258,7 @@ function update() {
         player.x = 5900;
         showDialogue(
           "🍎 新店水果王",
-          `<span>「你的錢不夠！湊齊 100 元再來找我！」<br><br><div style='background: #2d3436; border: 2px solid #f1c40f; border-radius: 10px; padding: 8px 16px; display: inline-block; color: #f1c40f; font-size: 32px; font-weight: 900;'>💰 目前持有金錢：$${money}</div></span>`,
+          `<span>「你的錢不夠！湊齊 100 元再來找我！」<br><br><div style='background: #2d3436; border: 2px solid #f1c40f; border-radius: 8px; padding: 6px 12px; display: inline-block; color: #f1c40f; font-weight: 900;'>💰 持有金錢：$${money}</div></span>`,
           `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">好吧</button>`
         );
       }
@@ -1258,7 +1295,7 @@ function update() {
             document.getElementById("qualify-txt").innerText = "🎉 成功擊碎 新莊王 巧馨 黑心臟！新莊重獲和平！";
             document.getElementById("qualify-txt").style.color = "#27ae60";
             createExplosion(8750, 160, true);
-            showDialogue("🏆 勝利", "<span><span style='font-size: 40px; color: #f1c40f;'>「不愧是大老二！！！」</span><br><br>新莊王 巧馨 黑化的跳動心臟已徹底碎裂，你成功拯救了新莊！</span>", `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">太神啦！</button>`);
+            showDialogue("🏆 勝利", "<span><span style='color: #f1c40f; font-weight: 900;'>「不愧是大老二！！！」</span><br><br>新莊王 巧馨 黑化的跳動心臟已徹底碎裂，你成功拯救了新莊！</span>", `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">太神啦！</button>`);
           }
         }
       }
@@ -1284,7 +1321,6 @@ function update() {
     if (!pic.visible) return;
     pic.floatAngle += 0.05;
 
-    // 碰到照片觸發變大，但照片不消失 (pic.visible 依然為 true)
     if (!pic.triggered && !hasPlayerPic &&
         player.x + player.w > pic.x + 30 && player.x < pic.x + pic.w - 30 &&
         player.y + player.h > pic.y + 30 && player.y < pic.y + pic.h) {
@@ -1422,7 +1458,7 @@ function update() {
             document.getElementById("qualify-txt").innerText = "🎉 成功擊碎 新莊王 巧馨 黑心臟！新莊重獲和平！";
             document.getElementById("qualify-txt").style.color = "#27ae60";
             createExplosion(8750, 160, true);
-            showDialogue("🏆 勝利", "<span><span style='font-size: 40px; color: #f1c40f;'>「不愧是大老二！！！」</span><br><br>新莊王 巧馨 黑化的跳動心臟已徹底碎裂，你成功拯救了新莊！</span>", `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">太神啦！</button>`);
+            showDialogue("🏆 勝利", "<span><span style='color: #f1c40f; font-weight: 900;'>「不愧是大老二！！！」</span><br><br>新莊王 巧馨 黑化的跳動心臟已徹底碎裂，你成功拯救了新莊！</span>", `<button class="dialog-btn btn-opt1" onclick="closeDialogue()">太神啦！</button>`);
           }
         }
       }
@@ -1750,7 +1786,6 @@ function drawQiaoXinBoss() {
   ctx.restore();
 }
 
-// 繪製神級柯基照片 (碰到後依然持續顯示)
 function drawPicDrop(x, y, w, h, angle) {
   const floatY = y + Math.sin(angle) * 10;
   ctx.save();
@@ -2023,7 +2058,6 @@ function draw() {
     ctx.restore();
   });
 
-  // 繪製神級柯基照片
   picDrops.forEach(pic => {
     if (!pic.visible) return;
     drawPicDrop(pic.x, pic.y, pic.w, pic.h, pic.floatAngle);
