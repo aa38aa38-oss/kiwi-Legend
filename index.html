@@ -765,7 +765,7 @@ function triggerBossEncounter() {
   bossTriggered = true;
   showDialogue(
     "👺 三重檳榔王 BOSS",
-    "<span>「小子，敢在三重撒野？<br><br><span style='color: #d63031; font-weight: 900;'>『要不要吃檳榔？』</span>」</span>",
+    "<span><span>「小子，敢在三重撒野？<br><br><span style='color: #d63031; font-weight: 900;'>『要不要吃檳榔？』</span>」</span></span>",
     `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); startBossFightAction();">⚔️ 少廢話，開打！</button>`
   );
 }
@@ -879,7 +879,7 @@ function triggerShangSheng() {
   shangshengTriggered = true;
   showDialogue(
     "🤝 上昇",
-    "<span>「嗨 年輕人，缺錢嗎？這 <span style='color:#f1c40f;'>10000 元</span> 先借你啦，快去買裝備！」</span>",
+    "<span><span>「嗨 年輕人，缺錢嗎？這 <span style='color:#f1c40f;'>10000 元</span> 先借你啦，快去買裝備！」</span></span>",
     `<button class="dialog-btn btn-opt1" onclick="acceptShangShengMoney()">🙏 太感謝了！</button>`
   );
 }
@@ -981,7 +981,6 @@ function enterMatchClub() {
   hotDogKingDefeated = false;
   totalHotDogSpawned = 0;
 
-  // 扎實地面延伸至 10500
   platforms = [ { x: 0, y: 380, w: 10500, h: 70, color: "#1f142e" } ];
   for (let i = 1; i < 35; i++) {
     platforms.push({ x: 280 * i, y: 380 - (i % 3) * 45, w: 140, h: 18, color: "#8e44ad" });
@@ -1067,28 +1066,28 @@ function summonRoyalHotdogArmy() {
   }
 }
 
-// 無對話窗直接進入熱狗王決戰
+// 熱狗王無對話窗直接突入戰鬥，並追加生成更多熱狗
 function activateHotDogKingBattle() {
   hotDogKingActive = true;
-  document.getElementById("qualify-txt").innerText = "🌭 熱狗王降臨！消滅場上所有突襲熱狗！";
+  document.getElementById("qualify-txt").innerText = "🔥 遭遇熱狗王！迎擊全方位熱狗暴雨大軍！";
   document.getElementById("qualify-txt").style.color = "#e74c3c";
 
-  // 召喚熱狗王專屬狂暴熱狗群
-  for (let i = 0; i < 18; i++) {
+  // 大量生成熱狗怪
+  for (let i = 0; i < 22; i++) {
     const subType = (i % 3 === 0 ? "hotdogStretch" : (i % 3 === 1 ? "hotdogVertical" : "hotdogStick"));
     enemies.push({
       type: subType,
-      x: 8200 + i * 140,
+      x: 8200 + i * 110,
       y: (subType === "hotdogVertical" ? 70 : 250),
-      w: 85, h: 38,
-      vx: -3.5 - Math.random() * 2,
+      w: 80, h: 36,
+      vx: -3.8 - Math.random() * 2,
       vy: (subType === "hotdogVertical" ? 3.0 : 0),
       alive: true, stickAngle: 0, baseGroundY: 380,
       minX: 7200, maxX: 10400,
       isBossMinion: true
     });
   }
-  totalHotDogSpawned = 18;
+  totalHotDogSpawned = 22;
 }
 
 function triggerVictoryHome() {
@@ -1317,12 +1316,12 @@ function update() {
       }
     }
 
-    // 主角靠近熱狗王區域 (7500) 自動開打，無對話框阻礙
+    // 走到 7500 處直接無縫進入熱狗王大戰
     if (player.x >= 7500 && !hotDogKingActive && !hotDogKingDefeated) {
       activateHotDogKingBattle();
     }
 
-    // 殲滅所有熱狗怪即迎來勝利
+    // 檢查是否殲滅所有熱狗
     if (hotDogKingActive && !hotDogKingDefeated) {
       const remainingHotDogs = enemies.filter(en => en.alive && (en.type.startsWith("hotdog") || en.type === "royalGoldenHotdog")).length;
       if (remainingHotDogs === 0) {
@@ -1429,7 +1428,8 @@ function update() {
         en.alive = false;
         createExplosion(en.x + en.w / 2, en.y + en.h / 2, true);
         killCount++;
-        if (currentScene === "xinzhuang") { money += 1; updateMoneyUI(); }
+        money += (currentScene === "xinzhuang" ? 1 : 0);
+        updateMoneyUI();
       }
     }
 
@@ -1501,7 +1501,8 @@ function update() {
           createExplosion(en.x + en.w / 2, en.y + en.h / 2, true);
           p.life = 0;
           killCount++;
-          if (currentScene === "xinzhuang") { money += 1; updateMoneyUI(); }
+          money += (currentScene === "xinzhuang" ? 1 : 0);
+          updateMoneyUI();
         }
       });
     }
@@ -1525,6 +1526,18 @@ function drawStreetBackground() {
   const skyGrad = ctx.createLinearGradient(0, 0, 0, 380);
   skyGrad.addColorStop(0, "#f1f6fa"); skyGrad.addColorStop(1, "#e4ecf2");
   ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  const templeOffset = -(cameraX * 0.25) % 1200;
+  ctx.translate(templeOffset, 0);
+  for (let rep = -1; rep < 6; rep++) {
+    const tx = rep * 1200;
+    ctx.fillStyle = "#c0392b"; ctx.fillRect(tx + 200, 140, 320, 240);
+    ctx.fillStyle = "#f1c40f"; ctx.beginPath();
+    ctx.moveTo(tx + 160, 140); ctx.lineTo(tx + 360, 70); ctx.lineTo(tx + 560, 140);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
 }
 
 function drawXinzhuangBackground() {
@@ -1538,31 +1551,37 @@ function drawMatchClubBackground() {
   const skyGrad = ctx.createLinearGradient(0, 0, 0, 380);
   skyGrad.addColorStop(0, `hsl(${flashHue}, 60%, 14%)`);
   skyGrad.addColorStop(1, "#191124");
-  ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.globalAlpha = 0.22;
+  for (let b = 0; b < 6; b++) {
+    ctx.fillStyle = `hsl(${(flashHue + b * 60) % 360}, 100%, 50%)`;
+    ctx.beginPath();
+    ctx.moveTo(100 + b * 130, 0);
+    ctx.lineTo(200 + b * 130 + Math.sin(matchClubDiscoTimer + b) * 80, 380);
+    ctx.lineTo(80 + b * 130 + Math.sin(matchClubDiscoTimer + b) * 80, 380);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
 }
 
 function drawEightGenerals(x, y, w, h) {
   ctx.fillStyle = "#e74c3c"; ctx.beginPath(); ctx.roundRect(x + 8, y + 28, w - 16, h - 35, 10); ctx.fill();
   ctx.fillStyle = "#f1c40f"; ctx.beginPath(); ctx.arc(x + w / 2, y + 16, 16, 0, Math.PI * 2); ctx.fill();
 }
-
 function drawBetelNutGangster(x, y, w, h) {
   ctx.fillStyle = "#dfe6e9"; ctx.beginPath(); ctx.roundRect(x + 10, y + 28, w - 20, h - 42, 6); ctx.fill();
 }
-
 function drawDrunkard(x, y, w, h) {
   ctx.fillStyle = "#b2bec3"; ctx.beginPath(); ctx.roundRect(x + 8, y + 28, w - 16, h - 35, 8); ctx.fill();
 }
-
 function drawBikerGang(x, y, w, h) {
   ctx.fillStyle = "#2d3436"; ctx.beginPath(); ctx.roundRect(x, y + 25, w, h - 35, 12); ctx.fill();
 }
-
 function drawDiveBird(x, y, w, h) {
   ctx.fillStyle = "#e74c3c"; ctx.beginPath(); ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 3, -0.4, 0, Math.PI * 2); ctx.fill();
 }
-
 function drawBaseballEnemy(x, y, w, h, hasBat) {
   ctx.fillStyle = "#dfe6e9"; ctx.beginPath(); ctx.roundRect(x + 10, y + 28, w - 20, h - 35, 6); ctx.fill();
 }
@@ -1626,17 +1645,28 @@ function drawHuangShangNpc() {
   ctx.restore();
 }
 
-// 熱狗王作為超大背景固定在右方
+// 讓熱狗王1.png 與 熱狗王2.png 左右並排、固定不動當作背景殿堂裝飾
 function drawHotDogKingBackground() {
   if (currentScene !== "matchClub") return;
   ctx.save();
-  const bgImg = (Math.floor(matchClubDiscoTimer * 3) % 2 === 0) ? hotdogKing1Img : hotdogKing2Img;
-  if (bgImg.complete && bgImg.naturalWidth > 0) {
-    ctx.drawImage(bgImg, 8400, 60, 420, 320);
+  ctx.shadowColor = "#e74c3c"; ctx.shadowBlur = 25;
+
+  // 左側 熱狗王1.png
+  if (hotdogKing1Img.complete && hotdogKing1Img.naturalWidth > 0) {
+    ctx.drawImage(hotdogKing1Img, 8100, 70, 240, 260);
   } else {
-    ctx.fillStyle = "rgba(192, 57, 43, 0.4)";
-    ctx.beginPath(); ctx.roundRect(8400, 60, 420, 320, 30); ctx.fill();
+    ctx.fillStyle = "#c0392b"; ctx.beginPath(); ctx.roundRect(8100, 70, 240, 260, 20); ctx.fill();
   }
+
+  // 右側 熱狗王2.png（與左側分開一段距離，穩定不閃爍）
+  if (hotdogKing2Img.complete && hotdogKing2Img.naturalWidth > 0) {
+    ctx.drawImage(hotdogKing2Img, 8400, 70, 240, 260);
+  } else {
+    ctx.fillStyle = "#d63031"; ctx.beginPath(); ctx.roundRect(8400, 70, 240, 260, 20); ctx.fill();
+  }
+
+  ctx.fillStyle = "#ff7675"; ctx.font = "bold 28px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText("🌭 熱狗王神殿 🌭", 8350, 45);
   ctx.restore();
 }
 
@@ -1666,10 +1696,7 @@ function draw() {
 
   if (currentScene === "street") drawBoss();
   else if (currentScene === "xinzhuang") { drawQiaoXinBoss(); drawShangShengNpc(); }
-  else if (currentScene === "matchClub") {
-    // 熱狗王大圖背景
-    drawHotDogKingBackground();
-  }
+  else if (currentScene === "matchClub") { drawHotDogKingBackground(); }
 
   platforms.forEach(p => {
     ctx.fillStyle = p.color;
@@ -1677,6 +1704,9 @@ function draw() {
     if (p.h > 50) {
       ctx.fillStyle = "#ffffff";
       for (let z = 0; z < p.w; z += 90) ctx.fillRect(p.x + z, p.y + 15, 45, 8);
+    } else {
+      ctx.fillStyle = currentScene === "street" ? "#00b894" : (currentScene === "xinzhuang" ? "#e84393" : "#fd79a8");
+      ctx.fillRect(p.x, p.y, p.w, 3);
     }
   });
 
@@ -1688,11 +1718,12 @@ function draw() {
   cityProps.forEach(prop => {
     ctx.save();
     ctx.fillStyle = prop.bg;
+    ctx.shadowColor = "#000"; ctx.shadowBlur = 8;
     ctx.beginPath(); ctx.roundRect(prop.x, prop.y, prop.w, prop.h, 6); ctx.fill();
     ctx.strokeStyle = prop.isBigPlacard ? "#f1c40f" : "#ffffff"; ctx.lineWidth = 3; ctx.stroke();
-    ctx.fillStyle = "#ffffff"; ctx.font = "bold 15px sans-serif"; ctx.textAlign = "center";
+    ctx.fillStyle = "#ffffff"; ctx.font = prop.isBigPlacard ? "bold 15px sans-serif" : "bold 12px sans-serif"; ctx.textAlign = "center";
     for (let c = 0; c < prop.text.length; c++) {
-      ctx.fillText(prop.text[c], prop.x + prop.w / 2, prop.y + 22 + c * 18);
+      ctx.fillText(prop.text[c], prop.x + prop.w / 2, prop.y + (prop.isBigPlacard ? 22 : 18) + c * (prop.isBigPlacard ? 19 : 18));
     }
     ctx.restore();
   });
@@ -1726,20 +1757,32 @@ function draw() {
         ctx.restore();
       } else if (en.type === "royalGoldenHotdog") {
         ctx.fillStyle = "#f39c12"; ctx.beginPath(); ctx.roundRect(en.x, en.y, en.w, en.h, 18); ctx.fill();
-        ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3; ctx.stroke();
-      } else {
-        ctx.fillStyle = "#e74c3c"; ctx.fillRect(en.x, en.y, en.w, en.h);
-      }
+      } else if (en.type === "betelNutGangster") drawBetelNutGangster(en.x, en.y, en.w, en.h);
+      else if (en.type === "eightGenerals") drawEightGenerals(en.x, en.y, en.w, en.h);
+      else if (en.type === "drunkard") drawDrunkard(en.x, en.y, en.w, en.h);
+      else if (en.type === "bikerGang") drawBikerGang(en.x, en.y, en.w, en.h);
+      else if (en.type === "diveBird") drawDiveBird(en.x, en.y, en.w, en.h);
+      else if (en.type === "baseballThrower") drawBaseballEnemy(en.x, en.y, en.w, en.h, false);
+      else if (en.type === "baseballBatter") drawBaseballEnemy(en.x, en.y, en.w, en.h, true);
     }
+  });
+
+  particles.forEach(pt => {
+    ctx.fillStyle = pt.color;
+    const size = pt.size || 4;
+    ctx.fillRect(pt.x, pt.y, size, size);
+  });
+
+  deathShockwaves.forEach(sw => {
+    ctx.save();
+    ctx.strokeStyle = sw.color; ctx.lineWidth = sw.lw; ctx.shadowColor = sw.color; ctx.shadowBlur = 20;
+    ctx.beginPath(); ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
   });
 
   projectiles.forEach(p => {
     ctx.save();
-    if (p.isBlackBag) {
-      const bagSize = 22 * (p.scale || 1);
-      ctx.fillStyle = "#1e272e"; ctx.beginPath(); ctx.roundRect(p.x - bagSize / 2, p.y - bagSize / 2, bagSize, bagSize, 6); ctx.fill();
-      ctx.strokeStyle = "#ff7675"; ctx.lineWidth = 2.5; ctx.stroke();
-    } else if (p.isBigGold) {
+    if (p.isBigGold) {
       ctx.fillStyle = "#f1c40f"; ctx.beginPath(); ctx.ellipse(p.x, p.y, 45 * (p.scale || 1), 20 * (p.scale || 1), 0, 0, Math.PI * 2); ctx.fill();
     } else {
       ctx.fillStyle = "#2ecc71"; ctx.beginPath(); ctx.ellipse(p.x, p.y, 28 * (p.scale || 1), 12 * (p.scale || 1), 0, 0, Math.PI * 2); ctx.fill();
@@ -1752,6 +1795,7 @@ function draw() {
     drawPicDrop(pic.x, pic.y, pic.w, pic.h, pic.floatAngle);
   });
 
+  // 主角繪製與動態圖片切換修復
   if (isPlayerDead) {
     ctx.save();
     ctx.translate(player.x + player.w / 2, player.y + player.h / 2);
@@ -1763,7 +1807,17 @@ function draw() {
     ctx.save();
     if (player.facingLeft) { ctx.translate(player.x + player.w, player.y); ctx.scale(-1, 1); }
     else { ctx.translate(player.x, player.y); }
-    ctx.drawImage(playerImg, 0, 0, player.w, player.h);
+
+    let drawImg = playerImg;
+    if (player.isDashing && playerRushImg.complete && playerRushImg.naturalWidth > 0) {
+      drawImg = playerRushImg;
+    } else if (!player.grounded && playerJumpImg.complete && playerJumpImg.naturalWidth > 0) {
+      drawImg = playerJumpImg;
+    } else if (player.isAttacking && playerSlashImg.complete && playerSlashImg.naturalWidth > 0) {
+      drawImg = playerSlashImg;
+    }
+
+    ctx.drawImage(drawImg, 0, 0, player.w, player.h);
     ctx.restore();
   }
 
