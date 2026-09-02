@@ -271,75 +271,88 @@
     display: none;
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #3b0909;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    z-index: 200;
-    justify-content: flex-start;
-    align-items: flex-end;
-    padding: 0 0 6% 5%;
+    z-index: 9999;
   }
   .game-over-panel {
-    width: 380px;
-    max-width: 44vw;
-    background: rgba(15, 23, 42, 0.88);
-    border: 3px solid #e74c3c;
-    border-radius: 16px;
-    padding: 20px 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 20px rgba(231, 76, 60, 0.4);
-    backdrop-filter: blur(6px);
+    position: absolute;
+    bottom: 8%;
+    left: 6%;
+    width: 330px;
+    max-width: 48%;
+    background: rgba(22, 27, 46, 0.92);
+    border: 2px solid #5a3244;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
     color: #ffffff;
     text-align: left;
   }
   .game-over-panel h2 {
-    font-size: 22px;
+    font-size: 18px;
     color: #ff7675;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     font-weight: 900;
     letter-spacing: 1px;
-    text-shadow: 2px 2px 0 #000;
+    text-shadow: 1px 1px 2px #000;
   }
   .game-over-panel p {
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.4;
     color: #f1f2f6;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     font-weight: bold;
-    text-shadow: 1px 1px 0 #000;
+    text-shadow: 1px 1px 1px #000;
   }
   .game-over-panel input {
     width: 100%;
-    padding: 10px 12px;
-    font-size: 15px;
+    padding: 8px 10px;
+    font-size: 13px;
     font-weight: bold;
     margin-bottom: 10px;
-    border-radius: 8px;
-    border: 2px solid #718093;
-    background: #1e272e;
+    border-radius: 6px;
+    border: 1.5px solid #485460;
+    background: rgba(15, 20, 32, 0.95);
     color: #fff;
     outline: none;
     text-align: center;
   }
   .game-over-panel input:focus {
-    border-color: #f1c40f;
-    box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+    border-color: #ff7675;
+    box-shadow: 0 0 6px rgba(255, 118, 117, 0.5);
   }
   .game-over-panel button {
     width: 100%;
-    padding: 11px 14px;
-    font-size: 15px;
+    padding: 9px 12px;
+    font-size: 14px;
     font-weight: 900;
     background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
     color: #fff;
-    border: 2px solid #ff7675;
-    border-radius: 8px;
+    border: 1px solid #ff7675;
+    border-radius: 6px;
     cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.4);
     letter-spacing: 1px;
   }
   .game-over-panel button:active {
     transform: translateY(2px);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    .game-over-panel {
+      bottom: 5%;
+      left: 5%;
+      width: 90%;
+      max-width: 90%;
+      padding: 14px;
+    }
   }
 </style>
 </head>
@@ -390,7 +403,7 @@
       <div class="game-over-panel">
         <h2>GAME OVER</h2>
         <p>輸入"阿德救救我"即可讓奇異果的英雄旅程繼續</p>
-        <input type="text" id="revive-input" placeholder="請在此輸入密語...">
+        <input type="text" id="revive-input" placeholder="請在此輸入密語..." onkeydown="if(event.key==='Enter') checkRevive();">
         <button onclick="checkRevive()">確認接關</button>
       </div>
     </div>
@@ -428,7 +441,10 @@ coverImg.onload = () => {
 
 const gameOverImg = new Image();
 gameOverImg.src = "戰敗畫面.PNG";
-gameOverImg.onerror = () => { gameOverImg.src = "gameover.png"; };
+gameOverImg.onerror = () => {
+  gameOverImg.src = "戰敗畫面.png";
+  gameOverImg.onerror = () => { gameOverImg.src = "gameover.png"; };
+};
 gameOverImg.onload = () => {
   document.getElementById("game-over-modal").style.backgroundImage = `url('${gameOverImg.src}')`;
 };
@@ -461,7 +477,6 @@ const playerSlashImg = new Image();
 playerSlashImg.src = "player-slash.png";
 playerSlashImg.onerror = () => { playerSlashImg.src = "player-slash.png.png"; };
 
-// 載入上昇背影圖片
 const shangshengImg = new Image();
 shangshengImg.src = "背影.png";
 
@@ -471,7 +486,6 @@ let isDialogueOpen = false;
 let streetCleared = false;
 let hasPlayerPic = false;
 
-// 新莊劇情狀態變數
 let money = 0;
 let chenCoupleTriggered = false;
 let fruitKing1Triggered = false;
@@ -484,7 +498,6 @@ let qiaoXinMaxHp = 22000;
 let qiaoXinAttackTimer = 0;
 let heartBeatTimer = 0;
 
-// 上昇實體物件
 let shangshengNpc = {
   x: 4500,
   y: 250,
@@ -493,7 +506,6 @@ let shangshengNpc = {
   visible: true
 };
 
-// 三重劇情狀態變數
 let bossTriggered = false;
 let bossDefeated = false;
 let bossHp = 9000;
@@ -556,6 +568,7 @@ function closeChapterModal() {
 function startGameAtChapter(ch) {
   closeChapterModal();
   document.getElementById("title-screen").style.display = "none";
+  document.getElementById("game-over-modal").style.display = "none";
   document.getElementById("ui").style.display = "block";
   document.getElementById("key-guide").style.display = "block";
   isTitleMode = false;
@@ -728,7 +741,15 @@ function hurtPlayer(dmg) {
     if (lives <= 0) {
       setTimeout(() => {
         isGameOver = true;
-        document.getElementById("game-over-modal").style.display = "flex";
+        const modal = document.getElementById("game-over-modal");
+        modal.style.display = "block";
+        const bgUrl = gameOverImg.src || "戰敗畫面.PNG";
+        modal.style.backgroundImage = `url('${bgUrl}')`;
+        const inputField = document.getElementById("revive-input");
+        if (inputField) {
+          inputField.value = "";
+          inputField.focus();
+        }
       }, 1000);
     } else {
       setTimeout(() => {
@@ -744,9 +765,6 @@ function hurtPlayer(dmg) {
   }
 }
 
-// ----------------------------------------
-// 第一章：三重場景
-// ----------------------------------------
 function enterSanchong() {
   currentScene = "street";
   mapWidth = 5200;
@@ -834,9 +852,6 @@ function triggerBossDefeatDialogue() {
   );
 }
 
-// ----------------------------------------
-// 第二章：新莊場景
-// ----------------------------------------
 function enterXinzhuang() {
   currentScene = "xinzhuang";
   mapWidth = 10000;
@@ -1148,9 +1163,6 @@ function update() {
     if (player.x + player.w > mapWidth) player.x = mapWidth - player.w;
   }
 
-  // ------------------------------------
-  // 場景更新
-  // ------------------------------------
   if (currentScene === "street") {
     if (player.x >= 4300 && !bossTriggered) {
       triggerBossEncounter();
@@ -2046,7 +2058,6 @@ function draw() {
     ctx.restore();
   }
 
-  // 主角繪製
   if (isPlayerDead) {
     ctx.save();
     ctx.translate(player.x + player.w / 2, player.y + player.h / 2);
@@ -2187,9 +2198,6 @@ function draw() {
   drawMegaManHealthBar();
 }
 
-// ----------------------------------------
-// 輸入監聽器（鍵盤與虛擬手把）
-// ----------------------------------------
 window.addEventListener("keydown", (e) => {
   if (isTitleMode || isDialogueOpen || isGameOver) return;
   const now = Date.now();
@@ -2274,16 +2282,21 @@ enterSanchong();
 loop();
 
 function checkRevive() {
-  const val = document.getElementById("revive-input").value.trim();
+  const inputEl = document.getElementById("revive-input");
+  const val = inputEl ? inputEl.value.trim() : "";
   if (val === "阿德救救我") {
     lives = 2;
     hp = 100;
     document.getElementById("lives-txt").innerText = lives;
     document.getElementById("game-over-modal").style.display = "none";
-    player.x = cameraX + 60;
+    if (inputEl) inputEl.value = "";
+    player.x = cameraX + 80;
     player.y = 150;
+    player.vy = 0;
+    player.vx = 0;
     isPlayerDead = false;
     isGameOver = false;
+    player.invincibleTimer = 90;
   } else {
     alert("密語錯誤，無法接關！");
   }
