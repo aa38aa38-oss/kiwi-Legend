@@ -1015,7 +1015,7 @@ function rejectFruitAndShowEnemies() {
     y: 160,
     w: 240, h: 240,
     visible: true,
-    collected: false,
+    triggered: false,
     floatAngle: 0
   });
 
@@ -1281,12 +1281,14 @@ function update() {
   }
 
   picDrops.forEach(pic => {
-    if (!pic.visible || pic.collected) return;
+    if (!pic.visible) return;
     pic.floatAngle += 0.05;
 
-    if (player.x + player.w > pic.x + 30 && player.x < pic.x + pic.w - 30 &&
+    // 碰到照片觸發變大，但照片不消失 (pic.visible 依然為 true)
+    if (!pic.triggered && !hasPlayerPic &&
+        player.x + player.w > pic.x + 30 && player.x < pic.x + pic.w - 30 &&
         player.y + player.h > pic.y + 30 && player.y < pic.y + pic.h) {
-      pic.collected = true;
+      pic.triggered = true;
       hasPlayerPic = true;
       targetScale = 1.5;
       isScalingSmoothly = true;
@@ -1748,6 +1750,7 @@ function drawQiaoXinBoss() {
   ctx.restore();
 }
 
+// 繪製神級柯基照片 (碰到後依然持續顯示)
 function drawPicDrop(x, y, w, h, angle) {
   const floatY = y + Math.sin(angle) * 10;
   ctx.save();
@@ -2020,8 +2023,9 @@ function draw() {
     ctx.restore();
   });
 
+  // 繪製神級柯基照片
   picDrops.forEach(pic => {
-    if (!pic.visible || pic.collected) return;
+    if (!pic.visible) return;
     drawPicDrop(pic.x, pic.y, pic.w, pic.h, pic.floatAngle);
   });
 
