@@ -318,42 +318,42 @@
   }
   .game-over-panel {
     position: absolute;
-    bottom: 8%;
-    left: 6%;
-    width: 330px;
-    max-width: 48%;
-    background: rgba(22, 27, 46, 0.92);
+    bottom: 6%;
+    left: 4%;
+    width: 280px;
+    max-width: 38%;
+    background: rgba(22, 27, 46, 0.94);
     border: 2px solid #5a3244;
-    border-radius: 12px;
-    padding: 16px 18px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.85);
     backdrop-filter: blur(4px);
     color: #ffffff;
     text-align: left;
   }
   .game-over-panel h2 {
-    font-size: 18px;
+    font-size: 16px;
     color: #ff7675;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     font-weight: 900;
     letter-spacing: 1px;
     text-shadow: 1px 1px 2px #000;
   }
   .game-over-panel p {
-    font-size: 12px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.35;
     color: #f1f2f6;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     font-weight: bold;
     text-shadow: 1px 1px 1px #000;
   }
   .game-over-panel input {
     width: 100%;
-    padding: 8px 10px;
-    font-size: 13px;
+    padding: 6px 8px;
+    font-size: 12px;
     font-weight: bold;
-    margin-bottom: 10px;
-    border-radius: 6px;
+    margin-bottom: 8px;
+    border-radius: 5px;
     border: 1.5px solid #485460;
     background: rgba(15, 20, 32, 0.95);
     color: #fff;
@@ -366,29 +366,51 @@
   }
   .game-over-panel button {
     width: 100%;
-    padding: 9px 12px;
-    font-size: 14px;
+    padding: 7px 10px;
+    font-size: 12px;
     font-weight: 900;
     background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
     color: #fff;
     border: 1px solid #ff7675;
-    border-radius: 6px;
+    border-radius: 5px;
     cursor: pointer;
-    box-shadow: 0 3px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4);
     letter-spacing: 1px;
   }
   .game-over-panel button:active {
-    transform: translateY(2px);
+    transform: translateY(1px);
     box-shadow: 0 1px 0 rgba(0,0,0,0.4);
   }
 
   @media (max-aspect-ratio: 1/1) {
     .game-over-panel {
-      bottom: 5%;
-      left: 5%;
-      width: 90%;
-      max-width: 90%;
-      padding: 14px;
+      bottom: 4%;
+      left: 3%;
+      width: 34%;
+      max-width: 36%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border-width: 1.5px;
+    }
+    .game-over-panel h2 {
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+    .game-over-panel p {
+      font-size: 8px;
+      line-height: 1.25;
+      margin-bottom: 5px;
+    }
+    .game-over-panel input {
+      padding: 3px 4px;
+      font-size: 9px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+    }
+    .game-over-panel button {
+      padding: 4px 6px;
+      font-size: 9px;
+      border-radius: 4px;
     }
   }
 </style>
