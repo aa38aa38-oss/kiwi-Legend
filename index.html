@@ -581,14 +581,14 @@ let shangshengNpc = {
   visible: true
 };
 
-// 第三章狀態變數
+// 第三章狀態變數：林口洪主委放大2倍 (寬250, 高280, y座標貼地設為100)
 let hongZhuWeiTriggered = false;
 let matchClubDiscoTimer = 0;
 let hongZhuWeiNpc = {
   x: 2400,
-  y: 240,
-  w: 125,
-  h: 140,
+  y: 100,
+  w: 250,
+  h: 280,
   visible: true
 };
 
@@ -1538,7 +1538,6 @@ function update() {
   // 第三章：Match Club
   // ------------------------------------
   else if (currentScene === "matchClub") {
-    // 碰撞到林口洪主委觸發對話
     if (hongZhuWeiNpc.visible && !hongZhuWeiTriggered) {
       if (player.x + player.w > hongZhuWeiNpc.x && player.x < hongZhuWeiNpc.x + hongZhuWeiNpc.w &&
           player.y + player.h > hongZhuWeiNpc.y && player.y < hongZhuWeiNpc.y + hongZhuWeiNpc.h) {
@@ -2136,37 +2135,36 @@ function drawShangShengNpc() {
   ctx.restore();
 }
 
-// 繪製林口洪主委 (裸男.png)
+// 繪製林口洪主委 (裸男.png) - 放大2倍 (寬250, 高280)
 function drawHongZhuWeiNpc() {
   if (currentScene !== "matchClub" || !hongZhuWeiNpc.visible) return;
   ctx.save();
   ctx.shadowColor = "#f1c40f";
-  ctx.shadowBlur = 20;
+  ctx.shadowBlur = 24;
 
   if (luonanImg.complete && luonanImg.naturalWidth > 0) {
     ctx.drawImage(luonanImg, hongZhuWeiNpc.x, hongZhuWeiNpc.y, hongZhuWeiNpc.w, hongZhuWeiNpc.h);
   } else {
     ctx.fillStyle = "#ff7675";
     ctx.beginPath();
-    ctx.roundRect(hongZhuWeiNpc.x, hongZhuWeiNpc.y, hongZhuWeiNpc.w, hongZhuWeiNpc.h, 12);
+    ctx.roundRect(hongZhuWeiNpc.x, hongZhuWeiNpc.y, hongZhuWeiNpc.w, hongZhuWeiNpc.h, 18);
     ctx.fill();
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 16px sans-serif";
+    ctx.font = "bold 20px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("林口洪主委", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y + 75);
+    ctx.fillText("林口洪主委", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y + 140);
   }
 
-  // 對話後永久標註黑色粗體「主委在此」
   if (!hongZhuWeiTriggered) {
     ctx.fillStyle = "#f1c40f";
-    ctx.font = "bold 16px sans-serif";
+    ctx.font = "bold 18px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("💬 碰主人交談", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y - 10);
+    ctx.fillText("💬 碰主人交談", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y - 14);
   } else {
     ctx.fillStyle = "#000000";
-    ctx.font = "900 16px sans-serif";
+    ctx.font = "900 20px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("主委在此", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y - 10);
+    ctx.fillText("主委在此", hongZhuWeiNpc.x + hongZhuWeiNpc.w / 2, hongZhuWeiNpc.y - 14);
   }
   ctx.restore();
 }
@@ -2260,10 +2258,9 @@ function draw() {
   } else if (currentScene === "xinzhuang") {
     drawQiaoXinBoss();
     drawShangShengNpc();
-  } else if (currentScene === "matchClub") {
-    drawHongZhuWeiNpc();
   }
 
+  // 繪製平台與階梯
   platforms.forEach(p => {
     ctx.fillStyle = p.color;
     ctx.fillRect(p.x, p.y, p.w, p.h);
@@ -2275,6 +2272,11 @@ function draw() {
       ctx.fillRect(p.x, p.y, p.w, 3);
     }
   });
+
+  // 在階梯繪製完成後，繪製林口洪主委，確保主委圖案蓋過階梯
+  if (currentScene === "matchClub") {
+    drawHongZhuWeiNpc();
+  }
 
   cityProps.forEach(prop => {
     ctx.save();
@@ -2391,15 +2393,21 @@ function draw() {
       ctx.fill();
     } else if (p.isBlackBag) {
       const bagSize = 22 * (p.scale || 1);
-      ctx.shadowColor = "#000";
-      ctx.shadowBlur = 12;
+      // 巧馨丟的垃圾袋：增添亮粉紅色光暈與亮色系描邊
+      ctx.shadowColor = "#ff4757";
+      ctx.shadowBlur = 16;
       ctx.fillStyle = "#1e272e";
       ctx.beginPath();
       ctx.roundRect(p.x - bagSize / 2, p.y - bagSize / 2, bagSize, bagSize, 6);
       ctx.fill();
 
-      ctx.fillStyle = "#e84393";
-      ctx.fillRect(p.x - 3, p.y - bagSize / 2 - 3, 6, 4);
+      ctx.strokeStyle = "#ff7675";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // 垃圾袋扎口亮色細節
+      ctx.fillStyle = "#ff6b81";
+      ctx.fillRect(p.x - 3, p.y - bagSize / 2 - 4, 6, 5);
     } else if (p.isBaseball) {
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
