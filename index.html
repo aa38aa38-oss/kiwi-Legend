@@ -447,6 +447,8 @@
           <button class="chapter-item-btn" onclick="startGameAtChapter(2.5)">🖤 第二章決戰：直達【新莊王 巧馨 黑心祭壇】</button>
           <button class="chapter-item-btn" onclick="startGameAtChapter(3)">🌈 第三章：Match Club 救主突入戰 (起點)</button>
           <button class="chapter-item-btn" onclick="startGameAtChapter(3.2)">🍸 第三章：直達【林口洪主委 會合處】</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(3.4)">👑 第三章：直達【皇上微服出巡熱狗宴】</button>
+          <button class="chapter-item-btn" onclick="startGameAtChapter(3.6)">🌭 第三章最終決戰：直達【熱狗王 BOSS】</button>
         </div>
         <button class="chapter-close-btn" onclick="closeChapterModal()">關閉選單</button>
       </div>
@@ -549,9 +551,18 @@ playerSlashImg.onerror = () => { playerSlashImg.src = "player-slash.png.png"; };
 const shangshengImg = new Image();
 shangshengImg.src = "背影.png";
 
-// 第三章資源：林口洪主委
+// 第三章資源
 const luonanImg = new Image();
 luonanImg.src = "裸男.png";
+
+const huangshangImg = new Image();
+huangshangImg.src = "皇上.png";
+
+const hotdogKing1Img = new Image();
+hotdogKing1Img.src = "熱狗王1.png";
+
+const hotdogKing2Img = new Image();
+hotdogKing2Img.src = "熱狗王2.png";
 
 let isTitleMode = true;
 let currentScene = "street"; // street | xinzhuang | matchClub
@@ -581,15 +592,40 @@ let shangshengNpc = {
   visible: true
 };
 
-// 第三章狀態變數：林口洪主委放大2倍 (寬250, 高280, y座標貼地設為100)
+// 第三章狀態變數
 let hongZhuWeiTriggered = false;
+let huangShangTriggered = false;
+let hotDogKingTriggered = false;
+let hotDogKingDefeated = false;
+let hotDogKingHp = 35000;
+let hotDogKingMaxHp = 35000;
+let hotDogKingAttackTimer = 0;
 let matchClubDiscoTimer = 0;
+
+// 林口洪主委 (寬250, 高280, y座標貼地設為100)
 let hongZhuWeiNpc = {
   x: 2400,
   y: 100,
   w: 250,
   h: 280,
   visible: true
+};
+
+// 皇上 (寬160, 高220, y座標貼地設為160)
+let huangShangNpc = {
+  x: 5600,
+  y: 160,
+  w: 160,
+  h: 220,
+  visible: true
+};
+
+// 熱狗王BOSS實體
+let hotDogBossEntity = {
+  x: 8600,
+  y: 140,
+  w: 220,
+  h: 230
 };
 
 let bossTriggered = false;
@@ -684,6 +720,11 @@ function startGameAtChapter(ch) {
 
   hongZhuWeiTriggered = false;
   hongZhuWeiNpc.visible = true;
+  huangShangTriggered = false;
+  huangShangNpc.visible = true;
+  hotDogKingTriggered = false;
+  hotDogKingDefeated = false;
+  hotDogKingHp = 35000;
 
   if (ch === 1) {
     enterSanchong();
@@ -725,6 +766,17 @@ function startGameAtChapter(ch) {
     enterMatchClub();
     player.x = 2250;
     cameraX = 2000;
+  } else if (ch === 3.4) {
+    enterMatchClub();
+    player.x = 5400;
+    cameraX = 5200;
+    hongZhuWeiTriggered = true;
+  } else if (ch === 3.6) {
+    enterMatchClub();
+    player.x = 8350;
+    cameraX = 8100;
+    hongZhuWeiTriggered = true;
+    huangShangTriggered = true;
   }
 }
 
@@ -1157,7 +1209,7 @@ function startQiaoXinFight() {
 // ----------------------------------------
 function enterMatchClub() {
   currentScene = "matchClub";
-  mapWidth = 8000;
+  mapWidth = 10000;
   cameraX = 0;
   isDialogueOpen = false;
   document.getElementById("dialog-box").style.display = "none";
@@ -1178,9 +1230,14 @@ function enterMatchClub() {
 
   hongZhuWeiTriggered = false;
   hongZhuWeiNpc.visible = true;
+  huangShangTriggered = false;
+  huangShangNpc.visible = true;
+  hotDogKingTriggered = false;
+  hotDogKingDefeated = false;
+  hotDogKingHp = 35000;
 
-  platforms = [ { x: 0, y: 380, w: 8000, h: 70, color: "#1f142e" } ];
-  for (let i = 1; i < 25; i++) {
+  platforms = [ { x: 0, y: 380, w: 10000, h: 70, color: "#1f142e" } ];
+  for (let i = 1; i < 30; i++) {
     platforms.push({ x: 300 * i, y: 380 - (i % 3) * 45, w: 140, h: 18, color: "#8e44ad" });
   }
 
@@ -1188,7 +1245,9 @@ function enterMatchClub() {
     { x: 300, y: 90, w: 30, h: 100, text: "MATCH CLUB", bg: "#fd79a8", isBigPlacard: true },
     { x: 1200, y: 80, w: 26, h: 95, text: "猛男熱舞舞台", bg: "#e84393" },
     { x: 2350, y: 70, w: 28, h: 110, text: "主委VIP包廂", bg: "#f1c40f", isBigPlacard: true },
-    { x: 3800, y: 80, w: 26, h: 100, text: "狂熱旋轉吧", bg: "#9b59b6" }
+    { x: 4200, y: 80, w: 26, h: 100, text: "狂熱旋轉吧", bg: "#9b59b6" },
+    { x: 5500, y: 70, w: 28, h: 110, text: "御用皇帝殿", bg: "#f39c12", isBigPlacard: true },
+    { x: 7800, y: 80, w: 28, h: 110, text: "熱狗王神殿", bg: "#c0392b", isBigPlacard: true }
   ];
 
   enemies = [];
@@ -1246,6 +1305,64 @@ function shoutAtHongZhuWei() {
       maxX: player.x + 3500
     });
   }
+}
+
+function triggerHuangShang() {
+  huangShangTriggered = true;
+  showDialogue(
+    "👑 皇上 (微服出巡)",
+    `<span><div style="font-weight: 900; color: #f1c40f; font-size: 22px;">「大膽奇異果！朕微服出巡至此歡場，你他媽的敢來鬧場? 來人啊，賞他滿漢全席特製熱狗！」</div></span>`,
+    `<button class="dialog-btn btn-opt1" onclick="summonRoyalHotdogArmy()">⚔️ 迎接皇帝熱狗宴！</button>`
+  );
+}
+
+function summonRoyalHotdogArmy() {
+  closeDialogue();
+  document.getElementById("qualify-txt").innerText = "✨ 散發神聖金光的皇家特製熱狗大軍來襲！突破封鎖！";
+  document.getElementById("qualify-txt").style.color = "#f1c40f";
+
+  for (let i = 0; i < 12; i++) {
+    enemies.push({
+      type: "royalGoldenHotdog",
+      x: player.x + 500 + i * 160,
+      y: 100 + (i % 3) * 65,
+      w: 85,
+      h: 38,
+      vx: -4.5,
+      vy: (Math.random() - 0.5) * 3,
+      alive: true,
+      minX: player.x,
+      maxX: player.x + 3000
+    });
+  }
+}
+
+function triggerHotDogKingBoss() {
+  hotDogKingTriggered = true;
+  hotDogKingAttackTimer = 0;
+  showDialogue(
+    "🌭 熱狗王 (歡場霸王)",
+    `<span><div style="font-weight: 900; color: #e74c3c; font-size: 22px;">「勇者奇異果，你的主人想吃熱狗，我就餵他吃熱狗！」</div><br>眾多熱狗的靈魂凝聚成終極熱狗王，全方位暴風熱狗彈雨即將展開！</span>`,
+    `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); startHotDogKingFight();">⚔️ 迎戰熱狗王！</button>`
+  );
+}
+
+function startHotDogKingFight() {
+  document.getElementById("qualify-txt").innerText = "🔥 終極大決戰！閃避狂暴熱狗暴雨，擊碎熱狗王！";
+  document.getElementById("qualify-txt").style.color = "#d63031";
+}
+
+function triggerHotDogKingDefeat() {
+  hotDogKingDefeated = true;
+  createExplosion(hotDogBossEntity.x + 110, hotDogBossEntity.y + 115, true);
+  createExplosion(hotDogBossEntity.x + 60, hotDogBossEntity.y + 60, true);
+  createExplosion(hotDogBossEntity.x + 160, hotDogBossEntity.y + 160, true);
+
+  showDialogue(
+    "🍸 林口洪主委",
+    `<span><div style="font-weight: 900; color: #f1c40f; font-size: 24px; text-align: center;">「我吃飽了，一起回家吧」</div><br>熱狗王的靈魂徹底消散，歡場的喧囂歸於平靜，主人終於被你喚醒！</span>`,
+    `<button class="dialog-btn btn-opt1" onclick="closeDialogue();">🐶 (緊緊跟隨主人回家)</button>`
+  );
 }
 
 function update() {
@@ -1359,9 +1476,7 @@ function update() {
     if (player.x + player.w > mapWidth) player.x = mapWidth - player.w;
   }
 
-  // ------------------------------------
   // 第一章
-  // ------------------------------------
   if (currentScene === "street") {
     if (player.x >= 4300 && !bossTriggered) {
       triggerBossEncounter();
@@ -1403,9 +1518,7 @@ function update() {
       enterXinzhuang();
     }
   } 
-  // ------------------------------------
   // 第二章
-  // ------------------------------------
   else if (currentScene === "xinzhuang") {
     if (player.x >= 1000 && !chenCoupleTriggered) triggerChenCouple();
     if (player.x >= 2500 && !fruitKing1Triggered) triggerFruitKing1();
@@ -1534,14 +1647,62 @@ function update() {
       }
     }
   }
-  // ------------------------------------
   // 第三章：Match Club
-  // ------------------------------------
   else if (currentScene === "matchClub") {
+    // 洪主委
     if (hongZhuWeiNpc.visible && !hongZhuWeiTriggered) {
       if (player.x + player.w > hongZhuWeiNpc.x && player.x < hongZhuWeiNpc.x + hongZhuWeiNpc.w &&
           player.y + player.h > hongZhuWeiNpc.y && player.y < hongZhuWeiNpc.y + hongZhuWeiNpc.h) {
         triggerHongZhuWei();
+      }
+    }
+
+    // 皇上微服出巡
+    if (huangShangNpc.visible && !huangShangTriggered) {
+      if (player.x + player.w > huangShangNpc.x && player.x < huangShangNpc.x + huangShangNpc.w &&
+          player.y + player.h > huangShangNpc.y && player.y < huangShangNpc.y + huangShangNpc.h) {
+        triggerHuangShang();
+      }
+    }
+
+    // 熱狗王BOSS觸發
+    if (player.x >= 8200 && !hotDogKingTriggered) {
+      triggerHotDogKingBoss();
+    }
+
+    // 熱狗王戰鬥
+    if (hotDogKingTriggered && !hotDogKingDefeated) {
+      hotDogKingAttackTimer++;
+      if (hotDogKingAttackTimer > 20) {
+        hotDogKingAttackTimer = 0;
+        // 噴射螺旋狂暴熱狗
+        for (let k = 0; k < 4; k++) {
+          const angle = Math.PI * 0.75 + (Math.random() * Math.PI * 0.5);
+          projectiles.push({
+            x: hotDogBossEntity.x + 60,
+            y: hotDogBossEntity.y + 100,
+            vx: -Math.cos(angle) * (6 + Math.random() * 4),
+            vy: Math.sin(angle) * (5 + Math.random() * 3),
+            life: 90,
+            isHotDogBullet: true,
+            scale: 1.25
+          });
+        }
+      }
+
+      if (player.isAttacking && !isPlayerDead) {
+        const slashBoxX = player.facingLeft ? player.x - 70 * player.scale : player.x + player.w - 20;
+        const slashBoxW = 100 * player.scale;
+        const bossHitX = hotDogBossEntity.x, bossHitY = hotDogBossEntity.y, bossHitW = hotDogBossEntity.w, bossHitH = hotDogBossEntity.h;
+
+        if (slashBoxX < bossHitX + bossHitW && slashBoxX + slashBoxW > bossHitX &&
+            player.y < bossHitY + bossHitH && player.y + player.h > bossHitY) {
+          hotDogKingHp -= 60;
+          createExplosion(bossHitX + 110, bossHitY + 115, true);
+          if (hotDogKingHp <= 0) {
+            triggerHotDogKingDefeat();
+          }
+        }
       }
     }
   }
@@ -1602,6 +1763,10 @@ function update() {
       en.x += en.vx;
       en.stickAngle = (en.stickAngle || 0) + 0.16;
       if (en.x <= en.minX || en.x + en.w >= en.maxX) en.vx *= -1;
+    } else if (en.type === "royalGoldenHotdog") {
+      en.x += en.vx;
+      en.y += en.vy;
+      if (en.y >= 340 || en.y <= 60) en.vy *= -1;
     } else if (en.type === "drunkard") {
       en.x += en.vx;
       if (en.x <= en.minX || en.x + en.w >= en.maxX) en.vx *= -1;
@@ -1676,7 +1841,7 @@ function update() {
     p.x += p.vx;
     p.y += p.vy;
 
-    if (p.isBetelNutBarrage || p.isBlackBag || p.isBaseball || p.isFirecracker || p.isWineBottle) {
+    if (p.isBetelNutBarrage || p.isBlackBag || p.isBaseball || p.isFirecracker || p.isWineBottle || p.isHotDogBullet) {
       if (p.y >= 380 - 15) {
         createExplosion(p.x, p.y, false);
         projectiles.splice(i, 1);
@@ -1685,7 +1850,7 @@ function update() {
       const pBoxX = player.x + player.w * 0.3;
       const pBoxW = player.w * 0.4;
       if (!isPlayerDead && p.x > pBoxX && p.x < pBoxX + pBoxW && p.y > player.y && p.y < player.y + player.h) {
-        hurtPlayer(15);
+        hurtPlayer(18);
         createExplosion(p.x, p.y, false);
         projectiles.splice(i, 1);
         continue;
@@ -1724,6 +1889,20 @@ function update() {
               "<span><span style='color: #e74c3c; font-weight: 900; font-size: 24px;'>「打贏我又怎樣，你的主人天天在gay bar樂不思蜀，今晚會有人牽你出門尿尿嗎？哈哈哈哈哈哈哈哈哈」</span><br><br>（黑化心臟劇烈震盪，前方撕裂出通往神祕歡場 Match Club 的光圈通道！）</span>",
               `<button class="dialog-btn btn-opt1" onclick="closeDialogue(); enterMatchClub();">🌈 前往神祕歡場 Match Club！</button>`
             );
+          }
+        }
+      }
+
+      // 熱狗王BOSS 遠程命中
+      if (hotDogKingTriggered && !hotDogKingDefeated && currentScene === "matchClub") {
+        const bossHitX = hotDogBossEntity.x, bossHitY = hotDogBossEntity.y, bossHitW = hotDogBossEntity.w, bossHitH = hotDogBossEntity.h;
+        if (p.x + hitRadiusX > bossHitX && p.x - hitRadiusX < bossHitX + bossHitW &&
+            p.y + hitRadiusY > bossHitY && p.y - hitRadiusY < bossHitY + bossHitH) {
+          hotDogKingHp -= (p.isBigGold ? 70 : 35);
+          createExplosion(p.x, p.y, true);
+          p.life = 0;
+          if (hotDogKingHp <= 0) {
+            triggerHotDogKingDefeat();
           }
         }
       }
@@ -2169,6 +2348,81 @@ function drawHongZhuWeiNpc() {
   ctx.restore();
 }
 
+// 繪製微服出巡的皇上 (皇上.png)
+function drawHuangShangNpc() {
+  if (currentScene !== "matchClub" || !huangShangNpc.visible) return;
+  ctx.save();
+  ctx.shadowColor = "#f1c40f";
+  ctx.shadowBlur = 24;
+
+  if (huangshangImg.complete && huangshangImg.naturalWidth > 0) {
+    ctx.drawImage(huangshangImg, huangShangNpc.x, huangShangNpc.y, huangShangNpc.w, huangShangNpc.h);
+  } else {
+    ctx.fillStyle = "#f39c12";
+    ctx.beginPath();
+    ctx.roundRect(huangShangNpc.x, huangShangNpc.y, huangShangNpc.w, huangShangNpc.h, 16);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 18px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("皇上", huangShangNpc.x + huangShangNpc.w / 2, huangShangNpc.y + 110);
+  }
+
+  if (!huangShangTriggered) {
+    ctx.fillStyle = "#f1c40f";
+    ctx.font = "bold 18px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("👑 參見皇上", huangShangNpc.x + huangShangNpc.w / 2, huangShangNpc.y - 14);
+  } else {
+    ctx.fillStyle = "#000000";
+    ctx.font = "900 20px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("皇上在此", huangShangNpc.x + huangShangNpc.w / 2, huangShangNpc.y - 14);
+  }
+  ctx.restore();
+}
+
+// 繪製熱狗王 BOSS (熱狗王1.png / 熱狗王2.png 動態姿態切換)
+function drawHotDogKingBoss() {
+  if (currentScene !== "matchClub" || !hotDogKingTriggered || hotDogKingDefeated) return;
+  ctx.save();
+  const currentHotdogImg = (Math.floor(matchClubDiscoTimer * 3) % 2 === 0) ? hotDogKing1Img : hotDogKing2Img;
+
+  ctx.shadowColor = "#e74c3c";
+  ctx.shadowBlur = 30;
+  if (currentHotdogImg.complete && currentHotdogImg.naturalWidth > 0) {
+    ctx.drawImage(currentHotdogImg, hotDogBossEntity.x, hotDogBossEntity.y, hotDogBossEntity.w, hotDogBossEntity.h);
+  } else {
+    ctx.fillStyle = "#c0392b";
+    ctx.beginPath();
+    ctx.roundRect(hotDogBossEntity.x, hotDogBossEntity.y, hotDogBossEntity.w, hotDogBossEntity.h, 20);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 22px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("熱狗王 BOSS", hotDogBossEntity.x + hotDogBossEntity.w / 2, hotDogBossEntity.y + 110);
+  }
+
+  // BOSS 標籤與血量條
+  ctx.fillStyle = "#ff7675";
+  ctx.font = "bold 32px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("🌭 歡場霸王．熱狗王 BOSS 🌭", hotDogBossEntity.x + hotDogBossEntity.w / 2, hotDogBossEntity.y - 30);
+
+  const bBarX = 8550, bBarY = 15, bBarW = 400, bBarH = 16;
+  ctx.fillStyle = "#000";
+  ctx.fillRect(bBarX - 4, bBarY - 4, bBarW + 8, bBarH + 8);
+  ctx.fillStyle = "#e74c3c";
+  ctx.fillRect(bBarX, bBarY, (hotDogKingHp / hotDogKingMaxHp) * bBarW, bBarH);
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(bBarX, bBarY, bBarW, bBarH);
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 14px sans-serif";
+  ctx.fillText("【歡場熱狗之王】", bBarX + bBarW / 2, bBarY - 8);
+  ctx.restore();
+}
+
 function drawMegaManHealthBar() {
   const barX = 14;
   const barY = 16;
@@ -2273,9 +2527,11 @@ function draw() {
     }
   });
 
-  // 在階梯繪製完成後，繪製林口洪主委，確保主委圖案蓋過階梯
+  // 第三章角色立繪（在階梯完成後繪製，確保覆蓋於階梯上方）
   if (currentScene === "matchClub") {
     drawHongZhuWeiNpc();
+    drawHuangShangNpc();
+    drawHotDogKingBoss();
   }
 
   cityProps.forEach(prop => {
@@ -2354,6 +2610,16 @@ function draw() {
         ctx.lineWidth = 3;
         ctx.strokeRect(-en.w / 2 + 4, -en.h / 2 + 4, en.w - 8, en.h - 8);
         ctx.restore();
+      } else if (en.type === "royalGoldenHotdog") {
+        ctx.shadowColor = "#f1c40f";
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = "#f39c12";
+        ctx.beginPath();
+        ctx.roundRect(en.x, en.y, en.w, en.h, 18);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 3;
+        ctx.stroke();
       } else if (en.type === "betelNutGangster") drawBetelNutGangster(en.x, en.y, en.w, en.h);
       else if (en.type === "eightGenerals") drawEightGenerals(en.x, en.y, en.w, en.h);
       else if (en.type === "drunkard") drawDrunkard(en.x, en.y, en.w, en.h);
@@ -2393,7 +2659,6 @@ function draw() {
       ctx.fill();
     } else if (p.isBlackBag) {
       const bagSize = 22 * (p.scale || 1);
-      // 巧馨丟的垃圾袋：增添亮粉紅色光暈與亮色系描邊
       ctx.shadowColor = "#ff4757";
       ctx.shadowBlur = 16;
       ctx.fillStyle = "#1e272e";
@@ -2405,9 +2670,17 @@ function draw() {
       ctx.lineWidth = 2.5;
       ctx.stroke();
 
-      // 垃圾袋扎口亮色細節
       ctx.fillStyle = "#ff6b81";
       ctx.fillRect(p.x - 3, p.y - bagSize / 2 - 4, 6, 5);
+    } else if (p.isHotDogBullet) {
+      ctx.shadowColor = "#e74c3c";
+      ctx.shadowBlur = 15;
+      ctx.fillStyle = "#e84393";
+      ctx.beginPath();
+      ctx.roundRect(p.x - 18, p.y - 9, 36, 18, 9);
+      ctx.fill();
+      ctx.fillStyle = "#f1c40f";
+      ctx.fillRect(p.x - 10, p.y - 2, 20, 4);
     } else if (p.isBaseball) {
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
