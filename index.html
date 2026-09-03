@@ -1463,7 +1463,7 @@ function update() {
   hpFlashTimer += 0.15;
   heartBeatTimer += 0.08;
   matchClubDiscoTimer += 0.08;
-  hotdogKingFrameTimer += 0.05;
+  hotdogKingFrameTimer += 0.018; // 放慢雙型態切換頻率
 
   for (let i = deathShockwaves.length - 1; i >= 0; i--) {
     const sw = deathShockwaves[i];
@@ -1787,7 +1787,6 @@ function update() {
 
       // 全方位熱狗暴風彈雨 (極高難度)
       if (hotdogKingAttackTimer % 18 === 0) {
-        // 從熱狗王核心向四周扇形放射高速熱狗
         const originX = 7700;
         const originY = 160;
         const count = 7;
@@ -1821,16 +1820,16 @@ function update() {
         }
       }
 
-      // 玩家攻擊熱狗王 BOSS (固定不動、龐大命中盒)
+      // 玩家攻擊熱狗王 BOSS (加大後之受擊判定盒)
       if (player.isAttacking && !isPlayerDead) {
         const slashBoxX = player.facingLeft ? player.x - 70 * player.scale : player.x + player.w - 20;
         const slashBoxW = 100 * player.scale;
-        const bossBoxX = 7500, bossBoxY = 40, bossBoxW = 420, bossBoxH = 320;
+        const bossBoxX = 7420, bossBoxY = -40, bossBoxW = 600, bossBoxH = 460;
 
         if (slashBoxX < bossBoxX + bossBoxW && slashBoxX + slashBoxW > bossBoxX &&
             player.y < bossBoxY + bossBoxH && player.y + player.h > bossBoxY) {
           hotdogKingHp -= (player.scale > 1.2 ? 65 : 35);
-          createExplosion(bossBoxX + 180, bossBoxY + 120, true);
+          createExplosion(bossBoxX + 300, bossBoxY + 230, true);
           if (hotdogKingHp <= 0) {
             hotdogKingHp = 0;
             triggerHotdogKingDefeated();
@@ -2022,8 +2021,9 @@ function update() {
         }
       }
 
+      // 劍氣攻擊熱狗王 BOSS (加大後之受擊判定盒)
       if (hotdogKingTriggered && !hotdogKingDefeated && currentScene === "matchClub") {
-        const bossBoxX = 7500, bossBoxY = 40, bossBoxW = 420, bossBoxH = 320;
+        const bossBoxX = 7420, bossBoxY = -40, bossBoxW = 600, bossBoxH = 460;
         if (p.x + hitRadiusX > bossBoxX && p.x - hitRadiusX < bossBoxX + bossBoxW &&
             p.y + hitRadiusY > bossBoxY && p.y - hitRadiusY < bossBoxY + bossBoxH) {
           hotdogKingHp -= (p.isBigGold ? 70 : 25);
@@ -2410,20 +2410,21 @@ function drawHuangShangNpc() {
   ctx.restore();
 }
 
-// 繪製熱狗王 BOSS (固定不動、大幅放大展示、雙型態切換)
+// 繪製熱狗王 BOSS (面積加大為 600x460，放慢雙圖切換頻率)
 function drawHotdogKingBoss() {
   if (currentScene !== "matchClub" || !hotdogKingTriggered || hotdogKingDefeated) return;
   ctx.save();
   ctx.fillStyle = "rgba(40, 10, 15, 0.9)";
   ctx.fillRect(7200, 0, 1000, 380);
 
-  const bossX = 7480;
-  const bossY = 30;
-  const bossW = 440;
-  const bossH = 340;
+  // 加大呈現面積與調整展示位置
+  const bossX = 7420;
+  const bossY = -40;
+  const bossW = 600;
+  const bossH = 460;
 
-  // 選擇熱狗王1或熱狗王2交替顯示氣勢 (慢速切換避免閃爍)
-  const useKing2 = Math.sin(hotdogKingFrameTimer * 2) > 0;
+  // 放慢雙圖切換節奏，平穩大氣不刺眼
+  const useKing2 = Math.sin(hotdogKingFrameTimer) > 0;
   const targetKingImg = (useKing2 && hotdogKing2Img.complete && hotdogKing2Img.naturalWidth > 0) ? hotdogKing2Img : hotdogKing1Img;
 
   ctx.shadowColor = "#e74c3c";
@@ -2432,16 +2433,15 @@ function drawHotdogKingBoss() {
   if (targetKingImg.complete && targetKingImg.naturalWidth > 0) {
     ctx.drawImage(targetKingImg, bossX, bossY, bossW, bossH);
   } else {
-    // 圖片若未載入時的厚實替代底色
     ctx.fillStyle = "#d63031";
     ctx.beginPath();
-    ctx.roundRect(bossX, bossY, bossW, bossH, 25);
+    ctx.roundRect(bossX, bossY + 40, bossW, bossH - 40, 25);
     ctx.fill();
     ctx.strokeStyle = "#f1c40f";
     ctx.lineWidth = 6;
     ctx.stroke();
     ctx.fillStyle = "#fff";
-    ctx.font = "900 36px sans-serif";
+    ctx.font = "900 40px sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("🌭 最終形態 熱狗王 🌭", bossX + bossW / 2, bossY + bossH / 2);
   }
