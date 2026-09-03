@@ -718,6 +718,25 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// 全程循環背景音樂
+const bgMusic = new Audio("music.mp3");
+bgMusic.loop = true;
+let isMusicStarted = false;
+
+function startBackgroundMusic() {
+  if (!isMusicStarted) {
+    bgMusic.play().then(() => {
+      isMusicStarted = true;
+    }).catch(() => {
+      // 若受瀏覽器限制，等待玩家下一次點擊或按鍵觸發
+    });
+  }
+}
+
+// 監聽全域第一次玩家點擊或按鍵，確保在各種裝置與瀏覽器上順暢播放音樂
+window.addEventListener("pointerdown", startBackgroundMusic, { once: true });
+window.addEventListener("keydown", startBackgroundMusic, { once: true });
+
 const coverImg = new Image();
 coverImg.src = "首頁封面.jpg";
 coverImg.onerror = () => { coverImg.src = "cover.jpg"; };
@@ -907,6 +926,7 @@ let isGameOver = false;
 const keys = { left: false, right: false, down: false };
 
 function openChapterModal() {
+  startBackgroundMusic();
   document.getElementById("chapter-modal").style.display = "flex";
 }
 
@@ -989,6 +1009,7 @@ function showFinalFreeze() {
 }
 
 function startGameAtChapter(ch) {
+  startBackgroundMusic();
   closeChapterModal();
   document.getElementById("title-screen").style.display = "none";
   document.getElementById("game-over-modal").style.display = "none";
