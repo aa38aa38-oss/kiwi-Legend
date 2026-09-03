@@ -727,13 +727,10 @@ function startBackgroundMusic() {
   if (!isMusicStarted) {
     bgMusic.play().then(() => {
       isMusicStarted = true;
-    }).catch(() => {
-      // 若受瀏覽器限制，等待玩家下一次點擊或按鍵觸發
-    });
+    }).catch(() => {});
   }
 }
 
-// 監聽全域第一次玩家點擊或按鍵，確保在各種裝置與瀏覽器上順暢播放音樂
 window.addEventListener("pointerdown", startBackgroundMusic, { once: true });
 window.addEventListener("keydown", startBackgroundMusic, { once: true });
 
@@ -956,7 +953,7 @@ function restartFromBeginning() {
 }
 
 // ----------------------------------------
-// 電影式黑底金字工作人員名單捲動控制
+// 電影式黑底金字工作人員名單捲動控制 (加速版)
 // ----------------------------------------
 function startCreditsRoll() {
   const endingScreen = document.getElementById("ending-screen");
@@ -974,7 +971,7 @@ function startCreditsRoll() {
   let currentTop = screenH;
   creditsContent.style.top = currentTop + "px";
 
-  const rollSpeed = 0.95; // 悠長的平穩電影捲動速率
+  const rollSpeed = 2.4; // 捲動速率提升，流暢快速推進
 
   function rollStep() {
     currentTop -= rollSpeed;
@@ -2675,13 +2672,11 @@ function drawHotdogKingBoss() {
   ctx.fillStyle = "rgba(40, 10, 15, 0.9)";
   ctx.fillRect(7200, 0, 1000, 380);
 
-  // 加大呈現面積與調整展示位置
   const bossX = 7420;
   const bossY = -40;
   const bossW = 600;
   const bossH = 460;
 
-  // 放慢雙圖切換節奏，平穩大氣不刺眼
   const useKing2 = Math.sin(hotdogKingFrameTimer) > 0;
   const targetKingImg = (useKing2 && hotdogKing2Img.complete && hotdogKing2Img.naturalWidth > 0) ? hotdogKing2Img : hotdogKing1Img;
 
@@ -2704,7 +2699,6 @@ function drawHotdogKingBoss() {
     ctx.fillText("🌭 最終形態 熱狗王 🌭", bossX + bossW / 2, bossY + bossH / 2);
   }
 
-  // 熱狗王專屬厚實血條
   const barX = 7500;
   const barY = 16;
   const barW = 400;
@@ -2753,6 +2747,7 @@ function drawPicDrop(x, y, w, h, angle) {
   ctx.restore();
 }
 
+// 繪製上昇大哥 (背影.png)
 function drawShangShengNpc() {
   if (!shangshengNpc.visible || currentScene !== "xinzhuang") return;
   ctx.save();
@@ -2907,7 +2902,6 @@ function draw() {
     drawBoss();
   } else if (currentScene === "xinzhuang") {
     drawQiaoXinBoss();
-    drawShangShengNpc();
   }
 
   // 繪製平台與階梯
@@ -2923,13 +2917,7 @@ function draw() {
     }
   });
 
-  // 第三章物件繪製
-  if (currentScene === "matchClub") {
-    drawHongZhuWeiNpc();
-    drawHuangShangNpc();
-    drawHotdogKingBoss();
-  }
-
+  // 場景看板/建築繪製
   cityProps.forEach(prop => {
     ctx.save();
     ctx.fillStyle = prop.bg;
@@ -2950,6 +2938,18 @@ function draw() {
     }
     ctx.restore();
   });
+
+  // 在階梯與場景之後繪製上昇大哥，使其完全覆蓋在最外層，不被階梯擋住
+  if (currentScene === "xinzhuang") {
+    drawShangShengNpc();
+  }
+
+  // 第三章物件繪製
+  if (currentScene === "matchClub") {
+    drawHongZhuWeiNpc();
+    drawHuangShangNpc();
+    drawHotdogKingBoss();
+  }
 
   shadows.forEach(sh => {
     ctx.save();
@@ -3037,7 +3037,6 @@ function draw() {
   projectiles.forEach(p => {
     ctx.save();
     if (p.isRoyalHotdog) {
-      // 皇上召喚的神聖金光超速皇家熱狗
       ctx.shadowColor = "#f1c40f";
       ctx.shadowBlur = 20;
       ctx.fillStyle = "#f39c12";
@@ -3048,7 +3047,6 @@ function draw() {
       ctx.lineWidth = 3;
       ctx.stroke();
     } else if (p.isStormHotdog) {
-      // 熱狗王暴風彈雨熱狗
       ctx.shadowColor = "#e74c3c";
       ctx.shadowBlur = 22;
       ctx.fillStyle = "#c0392b";
