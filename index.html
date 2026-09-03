@@ -525,7 +525,7 @@
     color: #f1c40f;
     font-family: serif, sans-serif;
     gap: 22px;
-    padding-bottom: 40px;
+    padding-bottom: 20px;
   }
 
   .credits-title {
@@ -571,7 +571,7 @@
     background-repeat: no-repeat;
     z-index: 10100;
     opacity: 0;
-    transition: opacity 1.6s ease-in-out;
+    transition: opacity 1.2s ease-in-out;
     justify-content: center;
     align-items: flex-end;
     padding-bottom: 16px;
@@ -686,8 +686,6 @@
         <div class="credit-row"><span class="credit-role">企劃</span><span class="credit-name">aa38</span></div>
         <div class="credit-row"><span class="credit-role">製作</span><span class="credit-name">aa38</span></div>
         <div class="credit-row"><span class="credit-role">靈感來源</span><span class="credit-name">社團不嫌多</span></div>
-        <div style="height: 60px;"></div>
-        <div style="font-size: 14px; letter-spacing: 3px; color: #f39c12;">— 全 劇 終 —</div>
       </div>
     </div>
 
@@ -962,8 +960,8 @@ function startCreditsRoll() {
     currentTop -= rollSpeed;
     creditsContent.style.top = currentTop + "px";
 
-    // 當名單完全滑出畫面頂端時，觸發最終定格畫面
-    if (currentTop + creditsContent.offsetHeight < -20) {
+    // 當名單完全滑出畫面頂端時，直接切換至最終定格畫面
+    if (currentTop + creditsContent.offsetHeight < -10) {
       showFinalFreeze();
     } else {
       creditsAnimFrame = requestAnimationFrame(rollStep);
